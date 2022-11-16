@@ -1,0 +1,11 @@
+{
+	"name": "qt-core",
+	"packageManager": "yarn@3.3.0",
+	"private": true,
+	"workspaces": [
+		"packages/*"
+	],
+	"engines": {
+		"node": ">=16"
+	}
+}
