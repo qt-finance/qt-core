@@ -52,10 +52,6 @@ const config: HardhatUserConfig = {
 				outDir: 'test-types', // For hardhat testing usage
 				target: 'ethers-v5',
 		  },
-
-	mocha: {
-		timeout: 400000,
-	},
 };
 
 export default config;

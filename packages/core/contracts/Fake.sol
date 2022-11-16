@@ -2,9 +2,9 @@
 pragma solidity 0.8.17;
 
 contract Fake {
-    address public owner;
+	address public owner;
 
-    constructor() {
-        owner = msg.sender;
-    }
+	constructor() {
+		owner = msg.sender;
+	}
 }
