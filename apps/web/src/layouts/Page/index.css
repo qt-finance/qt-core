@@ -1,0 +1,12 @@
+.page {
+	& > header {
+		margin: 0 auto;
+		width: 200px;
+		font-size: 20px;
+	}
+
+	& > div {
+		margin: 0 auto;
+		width: 800px;
+	}
+}

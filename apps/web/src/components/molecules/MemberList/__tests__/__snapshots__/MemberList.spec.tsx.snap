@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Renders Interactive story 1`] = `
+<body>
+  <div>
+    <div>
+      <button
+        class="button"
+        type="button"
+      >
+        Close
+      </button>
+      <ul />
+    </div>
+  </div>
+</body>
+`;
+
+exports[`Renders WithDefaultMember story 1`] = `
+<body>
+  <div>
+    <div>
+      <button
+        class="button"
+        type="button"
+      >
+        Close
+      </button>
+      <ul>
+        <li
+          data-testid="Jessy"
+        >
+          Lee
+        </li>
+      </ul>
+    </div>
+  </div>
+</body>
+`;

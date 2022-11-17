@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Renders Interactive story 1`] = `
+<body>
+  <div>
+    <ul>
+      <li
+        data-testid="1"
+      >
+        Lee
+      </li>
+      <li
+        data-testid="2"
+      >
+        Mike
+      </li>
+    </ul>
+  </div>
+</body>
+`;

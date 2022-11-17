@@ -1,0 +1,17 @@
+
+node_modules/*
+coverage/*
+public/*
+**/__snapshots__/*
+**/*.js
+**/*.ts
+**/*.tsx
+**/*.json
+**/*.jpg
+**/*.png
+**/*.svg
+.*
+**/*.md
+gitignore
+*.lock
+*.html

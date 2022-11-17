@@ -1,0 +1,174 @@
+{
+	"name": "@qt-core/web",
+	"private": true,
+	"version": "0.1.0",
+	"license": "MIT",
+	"scripts": {
+		"start": "npm run dev:develop",
+		"dev:develop": "cross-env NODE_ENV=development PROXY=develop API=dev babel-node server.js",
+		"dev:production": "cross-env NODE_ENV=development PROXY=production API=dev babel-node server.js",
+		"build:develop": "cross-env NODE_ENV=development API=develop webpack --config webpack.config.prod.babel.js",
+		"build": "cross-env NODE_ENV=production API=production webpack --config webpack.config.prod.babel.js",
+		"lint": "eslint . && stylelint .",
+		"storybook": "cross-env NODE_ENV=development PROXY=develop API=dev start-storybook -p 8000",
+		"prebuild:storybook": "npm run test:generate-output || true",
+		"build:storybook": "build-storybook -o public/storybook",
+		"test:generate-output": "jest --json --outputFile=.jest-test-results.json",
+		"test": "jest --coverage",
+		"commit": "git-cz",
+		"release": "standard-version",
+		"format": "prettier --config ./.prettierrc --write \"./{,**/}/*.{js,css,json}\"",
+		"component:create": "babel-node commands/component/create"
+	},
+	"engines": {
+		"node": ">=16"
+	},
+	"main": "index.js",
+	"dependencies": {
+		"classnames": "^2.3.1",
+		"core-js": "^3.25.0",
+		"history": "^5.3.0",
+		"injection-js": "^2.4.0",
+		"normalize.css": "^8.0.1",
+		"qs": "^6.11.0",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"regenerator-runtime": "^0.13.9",
+		"universal-router": "^9.1.0",
+		"whatwg-fetch": "^3.6.2"
+	},
+	"devDependencies": {
+		"@babel/cli": "^7.18.10",
+		"@babel/core": "^7.18.13",
+		"@babel/node": "^7.18.10",
+		"@babel/plugin-proposal-class-properties": "^7.18.6",
+		"@babel/plugin-proposal-decorators": "^7.20.0",
+		"@babel/plugin-proposal-json-strings": "^7.18.6",
+		"@babel/plugin-syntax-dynamic-import": "^7.8.3",
+		"@babel/plugin-syntax-import-meta": "^7.10.4",
+		"@babel/plugin-transform-react-constant-elements": "^7.18.12",
+		"@babel/preset-env": "^7.18.10",
+		"@babel/preset-react": "^7.18.6",
+		"@babel/preset-typescript": "^7.18.6",
+		"@babel/register": "^7.18.9",
+		"@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
+		"@storybook/addon-actions": "^6.5.10",
+		"@storybook/addon-essentials": "^6.5.10",
+		"@storybook/addon-interactions": "^6.5.10",
+		"@storybook/addon-links": "^6.5.10",
+		"@storybook/addon-postcss": "^2.0.0",
+		"@storybook/builder-webpack5": "^6.5.10",
+		"@storybook/manager-webpack5": "^6.5.10",
+		"@storybook/react": "^6.5.10",
+		"@storybook/testing-library": "^0.0.13",
+		"@storybook/testing-react": "^1.3.0",
+		"@svgr/webpack": "^6.3.1",
+		"@testing-library/jest-dom": "^5.16.5",
+		"@testing-library/react": "^13.4.0",
+		"@types/classnames": "^2.3.1",
+		"@types/jest": "^29.2.3",
+		"@types/qs": "^6.9.7",
+		"@types/react": "^18.0.24",
+		"@types/react-dom": "^18.0.8",
+		"@typescript-eslint/eslint-plugin": "^5.36.1",
+		"@typescript-eslint/parser": "^5.36.1",
+		"babel-eslint": "^10.1.0",
+		"babel-jest": "^29.2.3",
+		"babel-loader": "^8.2.5",
+		"babel-plugin-module-resolver": "^4.1.0",
+		"babel-plugin-transform-typescript-metadata": "^0.3.2",
+		"colors": "^1.4.0",
+		"commitizen": "^4.2.5",
+		"compression-webpack-plugin": "^10.0.0",
+		"connect-history-api-fallback": "^1.6.0",
+		"cross-env": "^7.0.3",
+		"css-loader": "^6.7.1",
+		"css-minimizer-webpack-plugin": "^4.0.0",
+		"cz-conventional-changelog": "^3.3.0",
+		"enquirer": "^2.3.6",
+		"eslint": "^8.23.0",
+		"eslint-config-airbnb": "^19.0.4",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-import": "^2.26.0",
+		"eslint-plugin-jsx-a11y": "^6.6.1",
+		"eslint-plugin-prettier": "^4.2.1",
+		"eslint-plugin-react": "^7.31.6",
+		"eslint-plugin-react-hooks": "^4.6.0",
+		"eslint-plugin-storybook": "^0.6.4",
+		"express": "^4.18.1",
+		"file-loader": "^6.2.0",
+		"html-webpack-plugin": "^5.5.0",
+		"http-proxy": "^1.18.1",
+		"identity-obj-proxy": "^3.0.0",
+		"isomorphic-fetch": "^2.2.1",
+		"jest": "^29.2.3",
+		"jest-environment-jsdom": "^29.2.3",
+		"mini-css-extract-plugin": "^2.6.1",
+		"nock": "^13.2.9",
+		"postcss": "^8.4.16",
+		"postcss-import": "^14.1.0",
+		"postcss-loader": "^7.0.1",
+		"postcss-preset-env": "^7.8.0",
+		"prettier": "^2.7.1",
+		"react-refresh": "^0.14.0",
+		"react-test-renderer": "^18.2.0",
+		"standard-version": "^9.5.0",
+		"storybook-css-modules": "^1.0.8",
+		"style-loader": "^3.3.1",
+		"stylelint": "^14.11.0",
+		"stylelint-config-standard": "^28.0.0",
+		"stylelint-order": "^5.0.0",
+		"terser-webpack-plugin": "^5.3.6",
+		"typescript": "^4.8.2",
+		"typescript-plugin-css-modules": "^3.4.0",
+		"url-loader": "^4.1.1",
+		"webpack": "^5.74.0",
+		"webpack-cli": "^4.10.0",
+		"webpack-dev-middleware": "^5.3.3",
+		"webpack-hot-middleware": "^2.25.2"
+	},
+	"jest": {
+		"testEnvironment": "jsdom",
+		"roots": [
+			"<rootDir>/src/"
+		],
+		"setupFiles": [
+			"<rootDir>/.jest/__conf__/polyfill.js",
+			"<rootDir>/.storybook/setup.js"
+		],
+		"setupFilesAfterEnv": [
+			"<rootDir>/.jest/__conf__/setup.js"
+		],
+		"testMatch": [
+			"**/src/**/*.spec.(ts|tsx)"
+		],
+		"automock": false,
+		"globals": {
+			"__TESTS__": true
+		},
+		"unmockedModulePathPatterns": [
+			"<rootDir>/node_modules/react/",
+			"<rootDir>/node_modules/react-dom/",
+			"<rootDir>/node_modules/@testing-library/react/",
+			"<rootDir>/node_modules/react-addons-test-utils/"
+		],
+		"moduleNameMapper": {
+			"\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/.jest/__mocks__/file.js",
+			"\\.(css|less)$": "identity-obj-proxy",
+			"\\.jest-test-results.json$": "<rootDir>/.jest/__mocks__/file.js"
+		},
+		"coveragePathIgnorePatterns": [
+			"<rootDir>/.storybook/",
+			"<rootDir>/node_modules/",
+			".stories.js"
+		]
+	},
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-conventional-changelog"
+		}
+	},
+	"moduleRoots": [
+		"src"
+	]
+}

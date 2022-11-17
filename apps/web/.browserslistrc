@@ -1,0 +1,6 @@
+# Browsers that we support
+
+firefox >= 67
+edge >= 79
+chrome >= 65
+safari >= 12

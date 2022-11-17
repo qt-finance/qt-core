@@ -1,0 +1,12 @@
+.button {
+	background: var(--standard);
+	padding: 4px 10px;
+	border-radius: 5px;
+	border: none;
+	color: var(--secondary);
+
+	&.reverse {
+		background: var(--secondary);
+		color: var(--standard);
+	}
+}

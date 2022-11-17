@@ -18,6 +18,7 @@ coverage.json
 typechain
 web3-types
 test-types
+public
 
 #Hardhat files
 cache

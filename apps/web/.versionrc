@@ -1,0 +1,5 @@
+{
+	"commitUrlFormat": "https://github.com/qt-finance/qt-core/commit/{{hash}}",
+	"compareUrlFormat": "https://github.com/qt-finance/qt-core/compare/{{previousTag}}...{{currentTag}}",
+	"issueUrlFormat": "https://github.com/qt-finance/qt-core/issues/{{id}}"
+}

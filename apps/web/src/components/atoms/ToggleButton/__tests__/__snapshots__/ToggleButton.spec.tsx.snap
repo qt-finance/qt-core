@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Renders Interactive story 1`] = `
+<body>
+  <div>
+    <button
+      class="button"
+      type="button"
+    >
+      Close Title
+    </button>
+  </div>
+</body>
+`;
+
+exports[`should become Open after click 1`] = `
+<div>
+  <button
+    class="button"
+    type="button"
+  >
+    Close
+  </button>
+</div>
+`;
+
+exports[`should become Open after click 2`] = `
+<div>
+  <button
+    class="button reverse"
+    type="button"
+  >
+    Open
+  </button>
+</div>
+`;
+
+exports[`should become Open after click 3`] = `
+<div>
+  <button
+    class="button"
+    type="button"
+  >
+    Close
+  </button>
+</div>
+`;

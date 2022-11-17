@@ -1,0 +1,16 @@
+.welcome {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 200px;
+	height: 200px;
+	border-radius: 100px;
+	color: var(--secondary);
+	background-color: var(--standard);
+	margin: 0 auto;
+	margin-top: 200px;
+	margin-bottom: 200px;
+	line-height: 32px;
+	font-weight: 300;
+	text-align: center;
+}
