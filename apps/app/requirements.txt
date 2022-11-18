@@ -1,0 +1,7 @@
+Flask
+Flask-Cors
+flask_restful
+python-dotenv
+bs4
+web3
+requests
