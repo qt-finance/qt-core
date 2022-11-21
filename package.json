@@ -8,5 +8,16 @@
 	],
 	"engines": {
 		"node": ">=16"
+	},
+	"scripts": {
+		"commit": "git-cz"
+	},
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-conventional-changelog"
+		}
+	},
+	"devDependencies": {
+		"commitizen": "^4.2.5"
 	}
 }

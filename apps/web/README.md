@@ -96,13 +96,6 @@ export default {
 };
 ```
 
-## Contribution
-
-此專案 commit message 使用 angular format ，並使用 [commitizen](http://commitizen.github.io/cz-cli/) 輔助產生 commit message
-
-- 加入修改的檔案 `git add .`
-- 產生 commit message `npm run commit`
-
 ## Release
 
 此專案使用 [standard-version](https://github.com/conventional-changelog/standard-version) 輔助 release 流程，自動產生 `CHANGELOG.md` 和 提升版本號（提升 major version 依據是否有 `feat` 來判斷）

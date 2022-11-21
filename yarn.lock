@@ -3484,7 +3484,6 @@ __metadata:
     babel-plugin-transform-typescript-metadata: ^0.3.2
     classnames: ^2.3.1
     colors: ^1.4.0
-    commitizen: ^4.2.5
     compression-webpack-plugin: ^10.0.0
     connect-history-api-fallback: ^1.6.0
     core-js: ^3.25.0
@@ -7014,6 +7013,12 @@ __metadata:
   checksum: 985163db2292fac9e5a1e072bf99f1b5baccf196e4de25a0b0b81865ebddeb3b3eb4480734ef0a2ac8c002845396b91aa89121f5b84f93981a4658164a9ec6e9
   languageName: node
   linkType: hard
+
+"app-d9f226@workspace:apps/app":
+  version: 0.0.0-use.local
+  resolution: "app-d9f226@workspace:apps/app"
+  languageName: unknown
+  linkType: soft
 
 "app-root-dir@npm:^1.0.2":
   version: 1.0.2
@@ -20149,6 +20154,8 @@ __metadata:
 "qt-core@workspace:.":
   version: 0.0.0-use.local
   resolution: "qt-core@workspace:."
+  dependencies:
+    commitizen: ^4.2.5
   languageName: unknown
   linkType: soft
 

@@ -15,7 +15,6 @@
 		"build:storybook": "build-storybook -o public/storybook",
 		"test:generate-output": "jest --json --outputFile=.jest-test-results.json",
 		"test": "jest --coverage",
-		"commit": "git-cz",
 		"release": "standard-version",
 		"format": "prettier --config ./.prettierrc --write \"./{,**/}/*.{js,css,json}\"",
 		"component:create": "babel-node commands/component/create"
@@ -78,7 +77,6 @@
 		"babel-plugin-module-resolver": "^4.1.0",
 		"babel-plugin-transform-typescript-metadata": "^0.3.2",
 		"colors": "^1.4.0",
-		"commitizen": "^4.2.5",
 		"compression-webpack-plugin": "^10.0.0",
 		"connect-history-api-fallback": "^1.6.0",
 		"cross-env": "^7.0.3",
@@ -162,11 +160,6 @@
 			"<rootDir>/node_modules/",
 			".stories.js"
 		]
-	},
-	"config": {
-		"commitizen": {
-			"path": "./node_modules/cz-conventional-changelog"
-		}
 	},
 	"moduleRoots": [
 		"src"
