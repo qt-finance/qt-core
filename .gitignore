@@ -20,9 +20,13 @@ web3-types
 test-types
 public
 
-#Hardhat files
+# Hardhat files
 cache
 artifacts
 
 remix-compiler.config.js
 .deps
+
+# python
+__pycache__/
+*.py[cod]
