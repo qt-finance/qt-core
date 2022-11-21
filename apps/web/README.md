@@ -95,17 +95,3 @@ export default {
 	'--desktop': '(width >= 1200px)',
 };
 ```
-
-## Release
-
-此專案使用 [standard-version](https://github.com/conventional-changelog/standard-version) 輔助 release 流程，自動產生 `CHANGELOG.md` 和 提升版本號（提升 major version 依據是否有 `feat` 來判斷）
-
-- `npm run release`
-
-可以自己決定 提升 patch, minor or major
-
-- `npm run release -- --release-as minor`
-
-**Warning**: 第一次 release 請下
-
-- `npm run release -- --first-release`
