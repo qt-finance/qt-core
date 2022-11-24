@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
+import { ethers, upgrades } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 import { Fake } from '../test-types';
@@ -9,7 +9,10 @@ describe('Fake', () => {
 		// Contracts are deployed using the first signer/account by default
 
 		const FakeContract = await ethers.getContractFactory('Fake');
-		const fake = (await FakeContract.deploy()) as Fake;
+		const fake = (await upgrades.deployProxy(FakeContract, {
+			initializer: 'initialize',
+			kind: 'uups',
+		})) as Fake;
 
 		return { fake };
 	}

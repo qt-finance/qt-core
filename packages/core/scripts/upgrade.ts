@@ -1,9 +1,13 @@
 import { ethers, upgrades } from 'hardhat';
 
+// import depolyData from '../.openzeppelin/goerli.json';
+
+// const deployedAddress = depolyData.proxies[0].address;
+const deployedAddress = '';
+
 async function main() {
 	const Fake = await ethers.getContractFactory('Fake');
-	const fake = await upgrades.deployProxy(Fake, {
-		initializer: 'initialize',
+	const fake = await upgrades.upgradeProxy(deployedAddress, Fake, {
 		kind: 'uups',
 	});
 

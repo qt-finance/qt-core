@@ -23,6 +23,7 @@ public
 # Hardhat files
 cache
 artifacts
+.openzeppelin
 
 remix-compiler.config.js
 .deps
