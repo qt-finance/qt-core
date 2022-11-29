@@ -1,5 +1,13 @@
 # qt-core
 
+## Build ABI
+
+會幫忙把 packages/core 裡 build 產生的 ABI 檔案複製到 apps/app 裡
+
+```
+yarn build
+```
+
 ## Contribution
 
 此專案 commit message 使用 [angular format](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines) ，並使用 [commitizen](http://commitizen.github.io/cz-cli/) 輔助產生 commit message

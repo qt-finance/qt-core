@@ -10,6 +10,7 @@
 		"node": ">=16"
 	},
 	"scripts": {
+		"build": "yarn workspace @qt-core/core run build && cp -r ./packages/core/artifacts ./apps/app/",
 		"commit": "git-cz",
 		"release": "standard-version"
 	},
