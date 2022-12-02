@@ -5,3 +5,4 @@ python-dotenv
 bs4
 web3
 requests
+Werkzeug
