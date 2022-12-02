@@ -3,8 +3,8 @@ from flask import Flask, request, abort, jsonify
 from flask_restful import Api, Resource
 from flask_cors import CORS
 import os
-import data
-import contract
+import Contract.contract as contract
+import Authority.register as register
 
 
 app = Flask(__name__)
@@ -14,7 +14,7 @@ CORS(app)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 apiKey=os.environ.get("SECRET")
-  
+
 
 class ApiVerify():
   
@@ -26,23 +26,22 @@ class ApiVerify():
         
         
     def postData(self,data):
-        if str(data).count('option')<1:
-            return jsonify({'Missing keywords': "option" })
+        if str(data).count('Option')<1:
+            return jsonify({'Missing keywords': "Option" })
         else:
             return None
 
 
-class apiCollect(Resource):    
+class Swap(Resource):    
     
     def __init__(self):
-      self.verify=ApiVerify()
+        self.verify=ApiVerify()
+        self.authority=register.Member()
+        self.swap=contract.callContract()   
 
-      
-    def get(self):
-      
-          
-        # data = request.args.get('USDT')
-        return jsonify({'USDT': "3000.0"})
+
+    def get(self):      
+        return jsonify({'message': "This api is only post"})
      
     
     def post(self):       
@@ -50,20 +49,93 @@ class apiCollect(Resource):
         data = request.get_json()       
         
         if self.verify.postData(data)!=None:
-            return self.verify.postData(data)
+            return self.verify.postData(data)       
+        
+        for row in self.authority.getContractAddress(data['Token']):
+            address=row[0]     
+        
+        try: 
+            if data['Option']=='Open':
+                self.swap.open(data['Proportion'],data['Price'],address)
+            else:
+                self.swap.close(data['Proportion'],data['Price'],address)
+        except Exception as e:
+            return jsonify({'Error': str(e)}) 
+                  
+        return jsonify({'Success': "Swap"})
+
+      
+class Register(Resource):    
+    
+    def __init__(self):
+        self.verify=ApiVerify()            
+        self.authority=register.Member()
+
              
+    def get(self):
+        return jsonify({'message': "This api is only post"})
+     
+    
+    def post(self):       
+        data = request.get_json()       
+
+        try:
+            self.authority.register(data['Account'],data['Password'])
+        except Exception as e:
+            return jsonify({'Error': str(e)})     
+              
+        return jsonify({'Success': "Register"}) 
+
+      
+class CreateStrategy(Resource):    
+    
+    def __init__(self):
+        self.verify=ApiVerify()            
+        self.authority=register.Member()
+
           
-        for i in data:
-            try:
-              item ={'Option':i['Option'],"Description":i['Description'],'Position':i['Position']}
-            except:
-              print()       
+    def get(self):
+        return jsonify({'message': "This api is only post"})
 
-        return item, 201
+     
+    def post(self):             
+        data = request.get_json()       
+
+        try:
+            token=self.authority.createStrategy(data['Account'],data['StrategyName'])
+        except Exception as e:
+            return jsonify({'Error': str(e)}) 
+
+        return jsonify({'Token': token})    
       
       
-api.add_resource(apiCollect, '/api/swap')
+class SetContract(Resource):    
+    
+    def __init__(self):
+        self.verify=ApiVerify()            
+        self.authority=register.Member()
+      
+      
+    def get(self):
+        return jsonify({'Message': "This api is only post"})
+     
+    
+    def post(self):             
+        data = request.get_json()                 
+       
+        try:
+            self.authority.setContract(data['Token'],data['Contract'])
+        except Exception as e:
+            jsonify({'Error': str(e)})        
 
+        return jsonify({'Success': "Set contract"})   
+
+      
+      
+api.add_resource(Swap, '/api/swap')
+api.add_resource(Register, '/api/register')
+api.add_resource(CreateStrategy, '/api/createStrategy')
+api.add_resource(SetContract, '/api/setContract')
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
