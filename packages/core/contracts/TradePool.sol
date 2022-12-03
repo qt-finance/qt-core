@@ -25,6 +25,22 @@ contract TradePool is Initializable, OwnableUpgradeable, UUPSUpgradeable, ERC20U
 	 */
 	IERC20 public tradeToken;
 
+	struct PendingPool {
+		// The total base token on pending pool
+		uint256 total;
+		// The joined accounts
+		address[] accounts;
+		// The asset of accounts
+		mapping(address => uint256) accountAsset;
+		// The maximum number of accounts on pending pool
+		uint256 maxAccounts;
+	}
+
+	/**
+	 * @notice Pending pool, the new base token that wait for next trade
+	 */
+	PendingPool public pendingPool;
+
 	function initialize(
 		string memory name_,
 		string memory symbol_,
@@ -44,4 +60,77 @@ contract TradePool is Initializable, OwnableUpgradeable, UUPSUpgradeable, ERC20U
 	}
 
 	function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+
+	/**
+	 * @notice Setup the maximum number of accounts on pending pool
+	 * @param maxAccounts_ The maximum number of accounts on pending pool
+	 */
+	function setMaxAccountsOnPendingPool(uint256 maxAccounts_) external onlyOwner {
+		pendingPool.maxAccounts = maxAccounts_;
+	}
+
+	/**
+	 * @notice Deposit base token into pending pool
+	 * @param amount The number of base token
+	 */
+	function joinPendingPool(uint256 amount) external {
+		require(amount > 0, 'Join amount must > 0');
+		require(pendingPool.accounts.length < pendingPool.maxAccounts, 'Reached maximum accounts');
+
+		address joinAccount = _msgSender();
+
+		baseToken.transferFrom(joinAccount, address(this), amount);
+
+		if (pendingPool.accountAsset[joinAccount] == 0) {
+			pendingPool.accounts.push(joinAccount);
+		}
+
+		pendingPool.total += amount;
+		pendingPool.accountAsset[joinAccount] += amount;
+	}
+
+	/**
+	 * @notice Withdraw base token from pending pool
+	 * @param amount The number of base token
+	 */
+	function leavePendingPool(uint256 amount) external {
+		require(amount > 0, 'Leave amount must > 0');
+
+		address leaveAccount = _msgSender();
+
+		require(
+			amount <= pendingPool.accountAsset[leaveAccount],
+			'Leave amount must <= Join amount'
+		);
+
+		if (amount == pendingPool.accountAsset[leaveAccount]) {
+			uint256 len = pendingPool.accounts.length;
+			uint256 accountIndex = len;
+
+			for (uint256 i = 0; i < len; i++) {
+				if (pendingPool.accounts[i] == leaveAccount) {
+					accountIndex = i;
+					break;
+				}
+			}
+
+			require(accountIndex < len, 'Must joined pending pool');
+
+			pendingPool.accounts[accountIndex] = pendingPool.accounts[len - 1];
+			pendingPool.accounts.pop();
+		}
+
+		baseToken.transfer(leaveAccount, amount);
+
+		pendingPool.total -= amount;
+		pendingPool.accountAsset[leaveAccount] -= amount;
+	}
+
+	function getAssetOnPendingPool(address account) external view returns (uint256) {
+		return pendingPool.accountAsset[account];
+	}
+
+	function getAccountsOnPendingPool() external view returns (address[] memory) {
+		return pendingPool.accounts;
+	}
 }
