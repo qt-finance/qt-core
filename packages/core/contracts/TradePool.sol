@@ -14,33 +14,15 @@ import {
 
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
-contract TradePool is Initializable, OwnableUpgradeable, UUPSUpgradeable, ERC20Upgradeable {
-	/**
-	 * @notice Base token, only can deposit this token
-	 */
-	IERC20 public baseToken;
+import { ITradePool } from './ITradePool.sol';
 
-	/**
-	 * @notice Pair token, the target token for trade
-	 */
-	IERC20 public tradeToken;
-
-	struct PendingPool {
-		// The total base token on pending pool
-		uint256 total;
-		// The joined accounts
-		address[] accounts;
-		// The asset of accounts
-		mapping(address => uint256) accountAsset;
-		// The maximum number of accounts on pending pool
-		uint256 maxAccounts;
-	}
-
-	/**
-	 * @notice Pending pool, the new base token that wait for next trade
-	 */
-	PendingPool public pendingPool;
-
+contract TradePool is
+	Initializable,
+	OwnableUpgradeable,
+	UUPSUpgradeable,
+	ERC20Upgradeable,
+	ITradePool
+{
 	function initialize(
 		string memory name_,
 		string memory symbol_,
@@ -61,19 +43,13 @@ contract TradePool is Initializable, OwnableUpgradeable, UUPSUpgradeable, ERC20U
 
 	function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
-	/**
-	 * @notice Setup the maximum number of accounts on pending pool
-	 * @param maxAccounts_ The maximum number of accounts on pending pool
-	 */
-	function setMaxAccountsOnPendingPool(uint256 maxAccounts_) external onlyOwner {
+	/// @inheritdoc ITradePool
+	function setMaxAccountsOnPendingPool(uint256 maxAccounts_) external override onlyOwner {
 		pendingPool.maxAccounts = maxAccounts_;
 	}
 
-	/**
-	 * @notice Deposit base token into pending pool
-	 * @param amount The number of base token
-	 */
-	function joinPendingPool(uint256 amount) external {
+	/// @inheritdoc ITradePool
+	function joinPendingPool(uint256 amount) external override {
 		require(amount > 0, 'Join amount must > 0');
 		require(pendingPool.accounts.length < pendingPool.maxAccounts, 'Reached maximum accounts');
 
@@ -89,11 +65,8 @@ contract TradePool is Initializable, OwnableUpgradeable, UUPSUpgradeable, ERC20U
 		pendingPool.accountAsset[joinAccount] += amount;
 	}
 
-	/**
-	 * @notice Withdraw base token from pending pool
-	 * @param amount The number of base token
-	 */
-	function leavePendingPool(uint256 amount) external {
+	/// @inheritdoc ITradePool
+	function leavePendingPool(uint256 amount) external override {
 		require(amount > 0, 'Leave amount must > 0');
 
 		address leaveAccount = _msgSender();
@@ -126,11 +99,13 @@ contract TradePool is Initializable, OwnableUpgradeable, UUPSUpgradeable, ERC20U
 		pendingPool.accountAsset[leaveAccount] -= amount;
 	}
 
-	function getAssetOnPendingPool(address account) external view returns (uint256) {
+	/// @inheritdoc ITradePool
+	function getAssetOnPendingPool(address account) external view override returns (uint256) {
 		return pendingPool.accountAsset[account];
 	}
 
-	function getAccountsOnPendingPool() external view returns (address[] memory) {
+	/// @inheritdoc ITradePool
+	function getAccountsOnPendingPool() external view override returns (address[] memory) {
 		return pendingPool.accounts;
 	}
 }
