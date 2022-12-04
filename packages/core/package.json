@@ -9,7 +9,9 @@
 		"build:test-types": "hardhat typechain",
 		"deploy": "hardhat run",
 		"verify": "hardhat verify --network goerli",
-		"test": "hardhat test",
+		"test": "npm run test:basic && npm run test:fork",
+		"test:basic": "hardhat test test/TradePool.spec.ts",
+		"test:fork": "HARDHAT_FORK_TEST=1 hardhat test test/OpenTrade.spec.ts",
 		"blocknode": "hardhat node",
 		"watch": "remixd -s . --remix-ide https://remix.ethereum.org",
 		"clean": "rm -rf .deps && rm -rf artifacts && rm -rf cache && rm -rf web3-types && rm -rf test-types"
@@ -43,6 +45,7 @@
 	},
 	"dependencies": {
 		"@openzeppelin/contracts": "^4.8.0",
-		"@openzeppelin/contracts-upgradeable": "^4.8.0"
+		"@openzeppelin/contracts-upgradeable": "^4.8.0",
+		"@uniswap/v3-periphery": "^1.4.3"
 	}
 }

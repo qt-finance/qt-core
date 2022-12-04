@@ -1,17 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import { Initializable } from '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
-import {
-	OwnableUpgradeable
-} from '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
-import {
-	UUPSUpgradeable
-} from '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
-import {
-	ERC20Upgradeable
-} from '@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol';
-
+import { ISwapRouter } from '@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 abstract contract ITradePool {
@@ -41,11 +31,27 @@ abstract contract ITradePool {
 	 */
 	PendingPool public pendingPool;
 
+	ISwapRouter public swapRouter;
+
+	address public trader;
+
 	/**
 	 * @notice Setup the maximum number of accounts on pending pool
 	 * @param maxAccounts_ The maximum number of accounts on pending pool
 	 */
 	function setMaxAccountsOnPendingPool(uint256 maxAccounts_) external virtual;
+
+	/**
+	 * @notice Setup the uniswap router
+	 * @param swapRouter_ The swap router
+	 */
+	function setSwapRouter(ISwapRouter swapRouter_) external virtual;
+
+	/**
+	 * @notice Setup the trader who can openLong and openShort
+	 * @param trader_ The trader
+	 */
+	function setTrader(address trader_) external virtual;
 
 	/**
 	 * @notice Deposit base token into pending pool
@@ -67,7 +73,34 @@ abstract contract ITradePool {
 	function getAssetOnPendingPool(address account) external view virtual returns (uint256);
 
 	/**
-	 * @notice Get asset with account on pending pool
+	 * @notice Get account list on pending pool
+	 * @return account number
 	 */
 	function getAccountsOnPendingPool() external view virtual returns (address[] memory);
+
+	/**
+	 * @notice The open long method. Sell baseToken and buy tradeToken
+	 * @param path The swap route path for uniswap
+	 * @param amountIn The number of base token
+	 * @param amountOutMinimum The minimum number of trade token
+	 * @return amountOut The number of trade token that buy from swap
+	 */
+	function openLong(
+		bytes calldata path,
+		uint256 amountIn,
+		uint256 amountOutMinimum
+	) external virtual returns (uint256);
+
+	/**
+	 * @notice The open short method. Sell tradeToken and buy baseToken
+	 * @param path The swap route path for uniswap
+	 * @param amountIn The number of trade token
+	 * @param amountOutMinimum The minimum number of base token
+	 * @return amountOut The number of base token that buy from swap
+	 */
+	function openShort(
+		bytes calldata path,
+		uint256 amountIn,
+		uint256 amountOutMinimum
+	) external virtual returns (uint256);
 }

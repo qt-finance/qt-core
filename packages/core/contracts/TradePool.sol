@@ -12,6 +12,8 @@ import {
 	ERC20Upgradeable
 } from '@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol';
 
+import { TransferHelper } from '@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol';
+import { ISwapRouter } from '@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 import { ITradePool } from './ITradePool.sol';
@@ -43,9 +45,24 @@ contract TradePool is
 
 	function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
+	modifier onlyTrader() {
+		require(trader == _msgSender(), 'TradePool: caller is not the trader');
+		_;
+	}
+
 	/// @inheritdoc ITradePool
 	function setMaxAccountsOnPendingPool(uint256 maxAccounts_) external override onlyOwner {
 		pendingPool.maxAccounts = maxAccounts_;
+	}
+
+	/// @inheritdoc ITradePool
+	function setSwapRouter(ISwapRouter swapRouter_) external override onlyOwner {
+		swapRouter = swapRouter_;
+	}
+
+	/// @inheritdoc ITradePool
+	function setTrader(address trader_) external override onlyOwner {
+		trader = trader_;
 	}
 
 	/// @inheritdoc ITradePool
@@ -107,5 +124,63 @@ contract TradePool is
 	/// @inheritdoc ITradePool
 	function getAccountsOnPendingPool() external view override returns (address[] memory) {
 		return pendingPool.accounts;
+	}
+
+	function openLong(
+		bytes calldata path,
+		uint256 amountIn,
+		uint256 amountOutMinimum
+	) external override onlyTrader returns (uint256) {
+		uint256 baseBalance = baseToken.balanceOf(address(this));
+
+		require(baseBalance >= amountIn, 'Must <= baseBalance');
+
+		uint256 amountOut = _trade(path, address(baseToken), amountIn, amountOutMinimum);
+
+		// initialize pending pool
+		pendingPool.total = 0;
+
+		for (uint256 i = 0; i < pendingPool.accounts.length; i++) {
+			pendingPool.accountAsset[pendingPool.accounts[i]] = 0;
+		}
+
+		delete pendingPool.accounts;
+
+		return amountOut;
+	}
+
+	function openShort(
+		bytes calldata path,
+		uint256 amountIn,
+		uint256 amountOutMinimum
+	) external override onlyTrader returns (uint256) {
+		uint256 tradeBalance = tradeToken.balanceOf(address(this));
+
+		require(tradeBalance >= amountIn, 'Must >= tradeBalance');
+
+		uint256 amountOut = _trade(path, address(tradeToken), amountIn, amountOutMinimum);
+
+		return amountOut;
+	}
+
+	function _trade(
+		bytes calldata path,
+		address amountInToken,
+		uint256 amountIn,
+		uint256 amountOutMinimum
+	) internal returns (uint256) {
+		TransferHelper.safeApprove(address(amountInToken), address(swapRouter), amountIn);
+
+		ISwapRouter.ExactInputParams memory uniSwapparams = ISwapRouter.ExactInputParams({
+			path: path,
+			recipient: address(this),
+			deadline: block.timestamp,
+			amountIn: amountIn,
+			amountOutMinimum: amountOutMinimum
+		});
+
+		uint256 amountOut = swapRouter.exactInput(uniSwapparams);
+
+		return amountOut;
 	}
 }
