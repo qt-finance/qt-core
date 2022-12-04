@@ -72,14 +72,28 @@ contract TradePool is
 
 		address joinAccount = _msgSender();
 
+		// Transfer base token from joinAccount
 		baseToken.transferFrom(joinAccount, address(this), amount);
 
-		if (pendingPool.accountAsset[joinAccount] == 0) {
+		// The new round
+		if (pendingPool.total == 0) {
+			pendingPool.currentRound++;
+		}
+
+		AccountData storage accountData = pendingPool.accountData[joinAccount];
+
+		// The account join the new round
+		if (accountData.round != pendingPool.currentRound) {
+			// Initialize the current round on account data
+			accountData.index = pendingPool.accounts.length;
+			accountData.asset = 0;
+			accountData.round = pendingPool.currentRound;
+
 			pendingPool.accounts.push(joinAccount);
 		}
 
 		pendingPool.total += amount;
-		pendingPool.accountAsset[joinAccount] += amount;
+		accountData.asset += amount;
 	}
 
 	/// @inheritdoc ITradePool
@@ -87,38 +101,36 @@ contract TradePool is
 		require(amount > 0, 'Leave amount must > 0');
 
 		address leaveAccount = _msgSender();
+		AccountData storage accountData = pendingPool.accountData[leaveAccount];
 
-		require(
-			amount <= pendingPool.accountAsset[leaveAccount],
-			'Leave amount must <= Join amount'
-		);
+		require(amount <= accountData.asset, 'Leave amount must <= Join amount');
 
-		if (amount == pendingPool.accountAsset[leaveAccount]) {
-			uint256 len = pendingPool.accounts.length;
-			uint256 accountIndex = len;
+		if (amount == accountData.asset) {
+			address lastAccount = pendingPool.accounts[pendingPool.accounts.length - 1];
 
-			for (uint256 i = 0; i < len; i++) {
-				if (pendingPool.accounts[i] == leaveAccount) {
-					accountIndex = i;
-					break;
-				}
-			}
-
-			require(accountIndex < len, 'Must joined pending pool');
-
-			pendingPool.accounts[accountIndex] = pendingPool.accounts[len - 1];
+			// Remove leaveAccount on accounts list
+			pendingPool.accounts[accountData.index] = lastAccount;
 			pendingPool.accounts.pop();
+
+			pendingPool.accountData[lastAccount].index = accountData.index;
+			accountData.index = 0;
 		}
 
-		baseToken.transfer(leaveAccount, amount);
-
 		pendingPool.total -= amount;
-		pendingPool.accountAsset[leaveAccount] -= amount;
+		accountData.asset -= amount;
+
+		baseToken.transfer(leaveAccount, amount);
 	}
 
 	/// @inheritdoc ITradePool
 	function getAssetOnPendingPool(address account) external view override returns (uint256) {
-		return pendingPool.accountAsset[account];
+		AccountData memory accountData = pendingPool.accountData[account];
+
+		if (pendingPool.total == 0) {
+			return 0;
+		}
+
+		return accountData.round == pendingPool.currentRound ? accountData.asset : 0;
 	}
 
 	/// @inheritdoc ITradePool
@@ -137,13 +149,8 @@ contract TradePool is
 
 		uint256 amountOut = _trade(path, address(baseToken), amountIn, amountOutMinimum);
 
-		// initialize pending pool
+		// Reset pending pool
 		pendingPool.total = 0;
-
-		for (uint256 i = 0; i < pendingPool.accounts.length; i++) {
-			pendingPool.accountAsset[pendingPool.accounts[i]] = 0;
-		}
-
 		delete pendingPool.accounts;
 
 		return amountOut;

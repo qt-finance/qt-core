@@ -15,13 +15,24 @@ abstract contract ITradePool {
 	 */
 	IERC20 public tradeToken;
 
+	struct AccountData {
+		// The asset of account
+		uint256 asset;
+		// The index of account in accounts list
+		uint256 index;
+		// The latest round of account join
+		uint256 round;
+	}
+
 	struct PendingPool {
+		// The current round on pending pool
+		uint256 currentRound;
 		// The total base token on pending pool
 		uint256 total;
 		// The joined accounts
 		address[] accounts;
-		// The asset of accounts
-		mapping(address => uint256) accountAsset;
+		// The data of account
+		mapping(address => AccountData) accountData;
 		// The maximum number of accounts on pending pool
 		uint256 maxAccounts;
 	}
