@@ -80,20 +80,20 @@ contract TradePool is
 			pendingPool.currentRound++;
 		}
 
-		AccountData storage accountData = pendingPool.accountData[joinAccount];
+		AccountData storage joinAccountData = accountData[joinAccount];
 
 		// The account join the new round
-		if (accountData.round != pendingPool.currentRound) {
+		if (joinAccountData.round != pendingPool.currentRound) {
 			// Initialize the current round on account data
-			accountData.index = pendingPool.accounts.length;
-			accountData.asset = 0;
-			accountData.round = pendingPool.currentRound;
+			joinAccountData.index = pendingPool.accounts.length;
+			joinAccountData.asset = 0;
+			joinAccountData.round = pendingPool.currentRound;
 
 			pendingPool.accounts.push(joinAccount);
 		}
 
 		pendingPool.total += amount;
-		accountData.asset += amount;
+		joinAccountData.asset += amount;
 	}
 
 	/// @inheritdoc ITradePool
@@ -101,36 +101,36 @@ contract TradePool is
 		require(amount > 0, 'Leave amount must > 0');
 
 		address leaveAccount = _msgSender();
-		AccountData storage accountData = pendingPool.accountData[leaveAccount];
+		AccountData storage leaveAccountData = accountData[leaveAccount];
 
-		require(amount <= accountData.asset, 'Leave amount must <= Join amount');
+		require(amount <= leaveAccountData.asset, 'Leave amount must <= Join amount');
 
-		if (amount == accountData.asset) {
+		if (amount == leaveAccountData.asset) {
 			address lastAccount = pendingPool.accounts[pendingPool.accounts.length - 1];
 
 			// Remove leaveAccount on accounts list
-			pendingPool.accounts[accountData.index] = lastAccount;
+			pendingPool.accounts[leaveAccountData.index] = lastAccount;
 			pendingPool.accounts.pop();
 
-			pendingPool.accountData[lastAccount].index = accountData.index;
-			accountData.index = 0;
+			accountData[lastAccount].index = leaveAccountData.index;
+			leaveAccountData.index = 0;
 		}
 
 		pendingPool.total -= amount;
-		accountData.asset -= amount;
+		leaveAccountData.asset -= amount;
 
 		baseToken.transfer(leaveAccount, amount);
 	}
 
 	/// @inheritdoc ITradePool
 	function getAssetOnPendingPool(address account) external view override returns (uint256) {
-		AccountData memory accountData = pendingPool.accountData[account];
-
 		if (pendingPool.total == 0) {
 			return 0;
 		}
 
-		return accountData.round == pendingPool.currentRound ? accountData.asset : 0;
+		AccountData memory accountData_ = accountData[account];
+
+		return accountData_.round == pendingPool.currentRound ? accountData_.asset : 0;
 	}
 
 	/// @inheritdoc ITradePool
@@ -138,6 +138,7 @@ contract TradePool is
 		return pendingPool.accounts;
 	}
 
+	/// @inheritdoc ITradePool
 	function openLong(
 		bytes calldata path,
 		uint256 amountIn,
@@ -156,6 +157,7 @@ contract TradePool is
 		return amountOut;
 	}
 
+	/// @inheritdoc ITradePool
 	function openShort(
 		bytes calldata path,
 		uint256 amountIn,

@@ -18,11 +18,18 @@ abstract contract ITradePool {
 	struct AccountData {
 		// The asset of account
 		uint256 asset;
-		// The index of account in accounts list
+		// The index of account in PendingPool accounts list
 		uint256 index;
 		// The latest round of account join
 		uint256 round;
+		// The valueIndex of account LP
+		uint256 valueIndex;
 	}
+
+	/**
+	 * @notice The data of account
+	 */
+	mapping(address => AccountData) public accountData;
 
 	struct PendingPool {
 		// The current round on pending pool
@@ -31,8 +38,6 @@ abstract contract ITradePool {
 		uint256 total;
 		// The joined accounts
 		address[] accounts;
-		// The data of account
-		mapping(address => AccountData) accountData;
 		// The maximum number of accounts on pending pool
 		uint256 maxAccounts;
 	}
