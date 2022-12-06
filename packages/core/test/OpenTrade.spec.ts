@@ -96,7 +96,7 @@ describe('TradePool Advenced method', () => {
 		});
 	});
 
-	describe('Trade with LP calculation', () => {
+	describe('Trade with Shares calculation', () => {
 		async function setupTradeWithSingleUserFixture() {
 			// Contracts are deployed using the first signer/account by default
 
@@ -163,26 +163,36 @@ describe('TradePool Advenced method', () => {
 			return { ...TradePool, user1JoinAmount, ownerJoinAmount };
 		}
 
-		it('should get the correct LP and setup valueIndex with single user', async () => {
+		it('should get the correct Shares and setup valueIndex with single user', async () => {
 			const { tradePool, owner, user1 } = await loadFixture(setupTradeWithSingleUserFixture);
 
-			const lpBalance = await tradePool.totalSupply();
-			const feeBalance = lpBalance.mul(3).div(1000);
+			const sharesBalance = await tradePool.totalSupply();
+			const feeBalance = sharesBalance.mul(3).div(1000);
 
-			expect(await tradePool.balanceOf(user1.address)).to.be.equal(lpBalance.sub(feeBalance));
+			expect(await tradePool.balanceOf(user1.address)).to.be.equal(sharesBalance.sub(feeBalance));
 			expect(await tradePool.balanceOf(owner.address)).to.be.equal(feeBalance);
 		});
 
-		it('should get the correct LP and setup valueIndex with multi user', async () => {
+		it('should redeem the Shares the correct Shares and setup valueIndex with single user', async () => {
+			const { tradePool, owner, user1 } = await loadFixture(setupTradeWithSingleUserFixture);
+
+			const sharesBalance = await tradePool.totalSupply();
+			const feeBalance = sharesBalance.mul(3).div(1000);
+
+			expect(await tradePool.balanceOf(user1.address)).to.be.equal(sharesBalance.sub(feeBalance));
+			expect(await tradePool.balanceOf(owner.address)).to.be.equal(feeBalance);
+		});
+
+		it('should get the correct Shares and setup valueIndex with multi user', async () => {
 			const { tradePool, owner, user1, ownerJoinAmount, user1JoinAmount } = await loadFixture(
 				setupTradeWithMultiUserFixture,
 			);
 
-			const lpBalance = await tradePool.totalSupply();
-			const feeBalance = lpBalance.mul(3).div(1000);
+			const sharesBalance = await tradePool.totalSupply();
+			const feeBalance = sharesBalance.mul(3).div(1000);
 
 			expect(await tradePool.balanceOf(user1.address)).to.be.equal(
-				lpBalance
+				sharesBalance
 					.sub(feeBalance)
 					.mul(user1JoinAmount)
 					.div(ownerJoinAmount + user1JoinAmount),
@@ -190,7 +200,7 @@ describe('TradePool Advenced method', () => {
 
 			expect(await tradePool.balanceOf(owner.address)).to.be.equal(
 				feeBalance.add(
-					lpBalance
+					sharesBalance
 						.sub(feeBalance)
 						.mul(ownerJoinAmount)
 						.div(ownerJoinAmount + user1JoinAmount),

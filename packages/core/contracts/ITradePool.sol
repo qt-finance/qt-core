@@ -22,7 +22,7 @@ abstract contract ITradePool {
 		uint256 index;
 		// The latest round of account join
 		uint256 round;
-		// The valueIndex of account LP
+		// The value of account's shares
 		uint256 valueIndex;
 	}
 
@@ -115,7 +115,7 @@ abstract contract ITradePool {
 
 	/**
 	 * @notice Redeem shares and withdraw asset with baseToken and tradeToken
-	 * @param shares The number of shares(LP token)
+	 * @param shares The number of shares token
 	 * @return (The withdraw number of baseToken, The withdraw number of tradeToken)
 	 */
 	function redeem(uint256 shares) external virtual returns (uint256, uint256);

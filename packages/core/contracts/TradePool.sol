@@ -152,14 +152,14 @@ contract TradePool is
 		require(shares > 0, 'TradePool: Must > 0');
 		require(shares <= balanceOf(msg.sender), 'TradePool: Must < balance of sender');
 
-		uint256 lpBalance = totalSupply();
+		uint256 sharesBalance = totalSupply();
 
 		_burn(msg.sender, shares);
 
 		uint256 withdrawBaseTokenBalance = (baseToken.balanceOf(address(this)) * shares) /
-			lpBalance;
+			sharesBalance;
 		uint256 withdrawTradeTokenBalance = (tradeToken.balanceOf(address(this)) * shares) /
-			lpBalance;
+			sharesBalance;
 
 		baseToken.transfer(msg.sender, withdrawBaseTokenBalance);
 		tradeToken.transfer(msg.sender, withdrawTradeTokenBalance);
@@ -222,7 +222,7 @@ contract TradePool is
 		return amountOut;
 	}
 
-	function _normalizeLP(uint256 baseTokenAsset) internal view returns (uint256) {
+	function _normalizeShares(uint256 baseTokenAsset) internal view returns (uint256) {
 		if (baseTokenDecimal < 18) {
 			return baseTokenAsset << (18 - baseTokenDecimal);
 		}
@@ -248,23 +248,23 @@ contract TradePool is
 
 		uint256 currentTotalValue = (tradeBalance * baseAmount) / tradeAmount + baseBalance;
 		uint256 expScale = 1e18;
-		uint256 lpBalance = totalSupply();
+		uint256 sharesBalance = totalSupply();
 
 		// console.log(baseAmount, tradeAmount, currentTotalValue);
 
 		if (pendingPoolTotal == 0) {
 			// Just calculate valudeIndex
-			valueIndex = (currentTotalValue * expScale) / lpBalance;
+			valueIndex = (currentTotalValue * expScale) / sharesBalance;
 			return 0;
 		}
 
 		// Get current balance;
-		uint256 distributeLP = 0;
+		uint256 distributeShares = 0;
 
 		// First distribute
-		if (lpBalance == 0) {
-			// Initialize: LP == Total number of baseToken
-			distributeLP = _normalizeLP(currentTotalValue);
+		if (sharesBalance == 0) {
+			// Initialize: Shares == Total number of baseToken
+			distributeShares = _normalizeShares(currentTotalValue);
 		} else {
 			// For long, buy tradeToken, sell baseToken
 			// For short, buy baseToken, sell tradeToken
@@ -286,37 +286,38 @@ contract TradePool is
 				'TradePool: Must more value to distribute LP'
 			);
 
-			distributeLP = _normalizeLP(
-				(lpBalance * currentTotalValue) / oldTotalValue - lpBalance
+			distributeShares = _normalizeShares(
+				(sharesBalance * currentTotalValue) / oldTotalValue - sharesBalance
 			);
 		}
 
-		valueIndex = (currentTotalValue * expScale) / (distributeLP + lpBalance);
+		valueIndex = (currentTotalValue * expScale) / (distributeShares + sharesBalance);
 
-		uint256 countDistributeLP = 0;
+		uint256 countDistributeShares = 0;
 
 		// 0.3% for fee
-		uint256 feeDistributeLP = (distributeLP * 3) / 1000;
-		distributeLP -= feeDistributeLP;
+		uint256 feeDistributeShares = (distributeShares * 3) / 1000;
+		distributeShares -= feeDistributeShares;
 
-		// distribute LP
+		// distribute shares
 		for (uint256 i = 0; i < pendingPool_.accounts.length; i++) {
 			address account = pendingPool_.accounts[i];
 			AccountData memory accountData_ = accountData[account];
 
-			uint256 accountDistributeLP = (distributeLP * accountData_.asset) / pendingPoolTotal;
+			uint256 accountDistributeShares = (distributeShares * accountData_.asset) /
+				pendingPoolTotal;
 
 			if (i == pendingPool_.accounts.length - 1) {
-				// Prevent loose LP
-				accountDistributeLP = distributeLP - countDistributeLP;
+				// Prevent loose shares
+				accountDistributeShares = distributeShares - countDistributeShares;
 			} else {
-				countDistributeLP += accountDistributeLP;
+				countDistributeShares += accountDistributeShares;
 			}
 
-			_mint(account, accountDistributeLP);
+			_mint(account, accountDistributeShares);
 		}
 
-		_mint(owner(), feeDistributeLP);
+		_mint(owner(), feeDistributeShares);
 
 		// Reset pending pool
 		pendingPool.total = 0;
