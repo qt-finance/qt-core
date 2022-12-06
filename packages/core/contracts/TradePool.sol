@@ -149,20 +149,22 @@ contract TradePool is
 
 	/// @inheritdoc ITradePool
 	function redeem(uint256 shares) external override returns (uint256, uint256) {
+		address redeemAccount = _msgSender();
+
 		require(shares > 0, 'TradePool: Must > 0');
-		require(shares <= balanceOf(msg.sender), 'TradePool: Must < balance of sender');
+		require(shares <= balanceOf(redeemAccount), 'TradePool: Must < balance of sender');
 
 		uint256 sharesBalance = totalSupply();
 
-		_burn(msg.sender, shares);
+		_burn(redeemAccount, shares);
 
 		uint256 withdrawBaseTokenBalance = (baseToken.balanceOf(address(this)) * shares) /
 			sharesBalance;
 		uint256 withdrawTradeTokenBalance = (tradeToken.balanceOf(address(this)) * shares) /
 			sharesBalance;
 
-		baseToken.transfer(msg.sender, withdrawBaseTokenBalance);
-		tradeToken.transfer(msg.sender, withdrawTradeTokenBalance);
+		baseToken.transfer(redeemAccount, withdrawBaseTokenBalance);
+		tradeToken.transfer(redeemAccount, withdrawTradeTokenBalance);
 
 		return (withdrawBaseTokenBalance, withdrawTradeTokenBalance);
 	}

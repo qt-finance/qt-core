@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ethers, network } from 'hardhat';
+import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 import { setupTradePoolOnForkMainnet, USDCAddress, USDC_DECIMAL, WETHAddress } from './fixture';
@@ -22,8 +22,6 @@ describe('TradePool Advenced method', () => {
 
 	describe('Trade', () => {
 		async function setupTradeFixture() {
-			// Contracts are deployed using the first signer/account by default
-
 			const TradePool = await setupTradePoolOnForkMainnet();
 
 			const { tradePool, user1, usdcToken } = TradePool;
@@ -98,11 +96,9 @@ describe('TradePool Advenced method', () => {
 
 	describe('Trade with Shares calculation', () => {
 		async function setupTradeWithSingleUserFixture() {
-			// Contracts are deployed using the first signer/account by default
-
 			const TradePool = await setupTradePoolOnForkMainnet();
 
-			const { tradePool, owner, user1, usdcToken, wethToken, trader } = TradePool;
+			const { tradePool, user1, usdcToken, trader } = TradePool;
 
 			const user1JoinAmount = 10000n * USDC_DECIMAL;
 
@@ -120,19 +116,13 @@ describe('TradePool Advenced method', () => {
 				.connect(trader)
 				.openLong(ethers.utils.solidityPack(pathType, path), sellAmount, amounOutMinimum);
 
-			// const wethBalance = await wethToken.balanceOf(tradePool.address);
-
-			// console.log(wethBalance);
-
 			return { ...TradePool, user1JoinAmount };
 		}
 
 		async function setupTradeWithMultiUserFixture() {
-			// Contracts are deployed using the first signer/account by default
-
 			const TradePool = await setupTradePoolOnForkMainnet();
 
-			const { tradePool, owner, user1, usdcToken, wethToken, trader } = TradePool;
+			const { tradePool, owner, user1, usdcToken, trader } = TradePool;
 
 			const user1JoinAmount = 10000n * USDC_DECIMAL;
 			const ownerJoinAmount = 5000n * USDC_DECIMAL;
@@ -156,10 +146,6 @@ describe('TradePool Advenced method', () => {
 				.connect(trader)
 				.openLong(ethers.utils.solidityPack(pathType, path), sellAmount, amounOutMinimum);
 
-			// const wethBalance = await wethToken.balanceOf(tradePool.address);
-
-			// console.log(wethBalance);
-
 			return { ...TradePool, user1JoinAmount, ownerJoinAmount };
 		}
 
@@ -171,16 +157,34 @@ describe('TradePool Advenced method', () => {
 
 			expect(await tradePool.balanceOf(user1.address)).to.be.equal(sharesBalance.sub(feeBalance));
 			expect(await tradePool.balanceOf(owner.address)).to.be.equal(feeBalance);
+			expect(await tradePool.valueIndex()).to.be.equal(10n ** 18n);
 		});
 
-		it('should redeem the Shares the correct Shares and setup valueIndex with single user', async () => {
-			const { tradePool, owner, user1 } = await loadFixture(setupTradeWithSingleUserFixture);
+		it('should redeem the Shares for withdraw assets with single user', async () => {
+			const { tradePool, user1, usdcToken, wethToken } = await loadFixture(
+				setupTradeWithSingleUserFixture,
+			);
 
+			const usdcBalance = await usdcToken.balanceOf(tradePool.address);
+			const wethBalance = await wethToken.balanceOf(tradePool.address);
 			const sharesBalance = await tradePool.totalSupply();
 			const feeBalance = sharesBalance.mul(3).div(1000);
+			const user1SharesBalance = sharesBalance.sub(feeBalance);
 
-			expect(await tradePool.balanceOf(user1.address)).to.be.equal(sharesBalance.sub(feeBalance));
-			expect(await tradePool.balanceOf(owner.address)).to.be.equal(feeBalance);
+			const withdrawWETHBalance = wethBalance.mul(user1SharesBalance).div(sharesBalance);
+			const withdrawUSDCBalance = usdcBalance.mul(user1SharesBalance).div(sharesBalance);
+
+			await expect(tradePool.connect(user1).redeem(user1SharesBalance))
+				.to.changeTokenBalances(
+					wethToken,
+					[tradePool, user1],
+					[-withdrawWETHBalance, withdrawWETHBalance],
+				)
+				.to.changeTokenBalances(
+					usdcToken,
+					[tradePool, user1],
+					[-withdrawUSDCBalance, withdrawUSDCBalance],
+				);
 		});
 
 		it('should get the correct Shares and setup valueIndex with multi user', async () => {
@@ -206,6 +210,33 @@ describe('TradePool Advenced method', () => {
 						.div(ownerJoinAmount + user1JoinAmount),
 				),
 			);
+			expect(await tradePool.valueIndex()).to.be.equal(10n ** 18n);
+		});
+
+		it('should redeem the Shares for withdraw assets with multi user', async () => {
+			const { tradePool, user1, usdcToken, wethToken } = await loadFixture(
+				setupTradeWithMultiUserFixture,
+			);
+
+			const usdcBalance = await usdcToken.balanceOf(tradePool.address);
+			const wethBalance = await wethToken.balanceOf(tradePool.address);
+			const sharesBalance = await tradePool.totalSupply();
+			const user1SharesBalance = await tradePool.balanceOf(user1.address);
+
+			const withdrawWETHBalance = wethBalance.mul(user1SharesBalance).div(sharesBalance);
+			const withdrawUSDCBalance = usdcBalance.mul(user1SharesBalance).div(sharesBalance);
+
+			await expect(tradePool.connect(user1).redeem(user1SharesBalance))
+				.to.changeTokenBalances(
+					wethToken,
+					[tradePool, user1],
+					[-withdrawWETHBalance, withdrawWETHBalance],
+				)
+				.to.changeTokenBalances(
+					usdcToken,
+					[tradePool, user1],
+					[-withdrawUSDCBalance, withdrawUSDCBalance],
+				);
 		});
 	});
 });
