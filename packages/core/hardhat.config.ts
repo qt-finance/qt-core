@@ -13,6 +13,7 @@ const config: HardhatUserConfig = {
 				enabled: true,
 				runs: 200,
 			},
+			viaIR: true,
 			evmVersion: 'berlin',
 			// for smock to mock contracts
 			outputSelection: {

@@ -15,8 +15,11 @@ import {
 import { TransferHelper } from '@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol';
 import { ISwapRouter } from '@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import { ERC20 } from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 
 import { ITradePool } from './ITradePool.sol';
+
+// import 'hardhat/console.sol';
 
 contract TradePool is
 	Initializable,
@@ -29,17 +32,23 @@ contract TradePool is
 		string memory name_,
 		string memory symbol_,
 		IERC20 baseToken_,
+		uint8 baseTokenDecimal_,
 		IERC20 tradeToken_
 	) public initializer {
 		__Ownable_init();
 		__UUPSUpgradeable_init();
 		__ERC20_init(name_, symbol_);
 
-		__init(baseToken_, tradeToken_);
+		__init(baseToken_, baseTokenDecimal_, tradeToken_);
 	}
 
-	function __init(IERC20 baseToken_, IERC20 tradeToken_) internal initializer {
+	function __init(
+		IERC20 baseToken_,
+		uint8 baseTokenDecimal_,
+		IERC20 tradeToken_
+	) internal initializer {
 		baseToken = baseToken_;
+		baseTokenDecimal = baseTokenDecimal_;
 		tradeToken = tradeToken_;
 	}
 
@@ -139,6 +148,26 @@ contract TradePool is
 	}
 
 	/// @inheritdoc ITradePool
+	function redeem(uint256 shares) external override returns (uint256, uint256) {
+		require(shares > 0, 'TradePool: Must > 0');
+		require(shares <= balanceOf(msg.sender), 'TradePool: Must < balance of sender');
+
+		uint256 lpBalance = totalSupply();
+
+		_burn(msg.sender, shares);
+
+		uint256 withdrawBaseTokenBalance = (baseToken.balanceOf(address(this)) * shares) /
+			lpBalance;
+		uint256 withdrawTradeTokenBalance = (tradeToken.balanceOf(address(this)) * shares) /
+			lpBalance;
+
+		baseToken.transfer(msg.sender, withdrawBaseTokenBalance);
+		tradeToken.transfer(msg.sender, withdrawTradeTokenBalance);
+
+		return (withdrawBaseTokenBalance, withdrawTradeTokenBalance);
+	}
+
+	/// @inheritdoc ITradePool
 	function openLong(
 		bytes calldata path,
 		uint256 amountIn,
@@ -150,9 +179,7 @@ contract TradePool is
 
 		uint256 amountOut = _trade(path, address(baseToken), amountIn, amountOutMinimum);
 
-		// Reset pending pool
-		pendingPool.total = 0;
-		delete pendingPool.accounts;
+		_rebalance(amountIn, amountOut, TradeType.long);
 
 		return amountOut;
 	}
@@ -168,6 +195,8 @@ contract TradePool is
 		require(tradeBalance >= amountIn, 'Must >= tradeBalance');
 
 		uint256 amountOut = _trade(path, address(tradeToken), amountIn, amountOutMinimum);
+
+		_rebalance(amountOut, amountIn, TradeType.short);
 
 		return amountOut;
 	}
@@ -191,5 +220,133 @@ contract TradePool is
 		uint256 amountOut = swapRouter.exactInput(uniSwapparams);
 
 		return amountOut;
+	}
+
+	function _normalizeLP(uint256 baseTokenAsset) internal view returns (uint256) {
+		if (baseTokenDecimal < 18) {
+			return baseTokenAsset << (18 - baseTokenDecimal);
+		}
+
+		if (baseTokenDecimal > 18) {
+			return baseTokenAsset >> (baseTokenDecimal - 18);
+		}
+
+		return baseTokenAsset;
+	}
+
+	function _rebalance(
+		uint256 baseAmount,
+		uint256 tradeAmount,
+		TradeType tradeType
+	) internal returns (uint256) {
+		PendingPool memory pendingPool_ = pendingPool;
+
+		uint256 pendingPoolTotal = pendingPool_.total;
+
+		uint256 tradeBalance = tradeToken.balanceOf(address(this));
+		uint256 baseBalance = baseToken.balanceOf(address(this));
+
+		uint256 currentTotalValue = (tradeBalance * baseAmount) / tradeAmount + baseBalance;
+		uint256 expScale = 1e18;
+		uint256 lpBalance = totalSupply();
+
+		// console.log(baseAmount, tradeAmount, currentTotalValue);
+
+		if (pendingPoolTotal == 0) {
+			// Just calculate valudeIndex
+			valueIndex = (currentTotalValue * expScale) / lpBalance;
+			return 0;
+		}
+
+		// Get current balance;
+		uint256 distributeLP = 0;
+
+		// First distribute
+		if (lpBalance == 0) {
+			// Initialize: LP == Total number of baseToken
+			distributeLP = _normalizeLP(currentTotalValue);
+		} else {
+			// For long, buy tradeToken, sell baseToken
+			// For short, buy baseToken, sell tradeToken
+			uint256 oldTradeBalance = tradeType == TradeType.long
+				? tradeBalance - tradeAmount
+				: tradeBalance + tradeAmount;
+			uint256 oldBaseBalance = tradeType == TradeType.long
+				? baseBalance + baseAmount
+				: baseBalance - baseAmount;
+
+			// Calculate old total value
+			uint256 oldTotalValue = (oldTradeBalance * baseAmount) /
+				tradeAmount +
+				oldBaseBalance -
+				pendingPoolTotal;
+
+			require(
+				currentTotalValue > oldTotalValue,
+				'TradePool: Must more value to distribute LP'
+			);
+
+			distributeLP = _normalizeLP(
+				(lpBalance * currentTotalValue) / oldTotalValue - lpBalance
+			);
+		}
+
+		valueIndex = (currentTotalValue * expScale) / (distributeLP + lpBalance);
+
+		uint256 countDistributeLP = 0;
+
+		// 0.3% for fee
+		uint256 feeDistributeLP = (distributeLP * 3) / 1000;
+		distributeLP -= feeDistributeLP;
+
+		// distribute LP
+		for (uint256 i = 0; i < pendingPool_.accounts.length; i++) {
+			address account = pendingPool_.accounts[i];
+			AccountData memory accountData_ = accountData[account];
+
+			uint256 accountDistributeLP = (distributeLP * accountData_.asset) / pendingPoolTotal;
+
+			if (i == pendingPool_.accounts.length - 1) {
+				// Prevent loose LP
+				accountDistributeLP = distributeLP - countDistributeLP;
+			} else {
+				countDistributeLP += accountDistributeLP;
+			}
+
+			_mint(account, accountDistributeLP);
+		}
+
+		_mint(owner(), feeDistributeLP);
+
+		// Reset pending pool
+		pendingPool.total = 0;
+		delete pendingPool.accounts;
+
+		return 0;
+	}
+
+	function _beforeTokenTransfer(
+		address from,
+		address to,
+		uint256 amount
+	) internal override {
+		// Ignore Burn
+		if (to == address(0)) {
+			return;
+		}
+
+		AccountData storage toAccountData = accountData[to];
+
+		uint256 toValueIndex = toAccountData.valueIndex;
+		uint256 toBalance = balanceOf(to);
+
+		// Come from _mint => The newest valueIndex
+		// Come from user => accountData[from].valueIndex
+		uint256 fromValueIndex = from == address(0) ? valueIndex : accountData[from].valueIndex;
+
+		// Average account value index
+		toAccountData.valueIndex =
+			(fromValueIndex * amount + toValueIndex * toBalance) /
+			(amount + toBalance);
 	}
 }

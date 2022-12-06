@@ -13,7 +13,7 @@ export async function setupTradePool() {
 	const TradePoolContract = await ethers.getContractFactory('TradePool');
 	const tradePool = (await upgrades.deployProxy(
 		TradePoolContract,
-		['qTT-BT', 'TT-BT trade pool', baseToken.address, tradeToken.address],
+		['qTT-BT', 'TT-BT trade pool', baseToken.address, 18, tradeToken.address],
 		{
 			initializer: 'initialize',
 			kind: 'uups',
@@ -46,7 +46,7 @@ export async function setupTradePoolOnForkMainnet() {
 	const TradePoolContract = await ethers.getContractFactory('TradePool');
 	const tradePool = (await upgrades.deployProxy(
 		TradePoolContract,
-		['qWETH-USDC', 'WETH-USDC trade pool', usdcToken.address, wethToken.address],
+		['qWETH-USDC', 'WETH-USDC trade pool', usdcToken.address, 18, wethToken.address],
 		{
 			initializer: 'initialize',
 			kind: 'uups',

@@ -52,6 +52,25 @@ abstract contract ITradePool {
 	address public trader;
 
 	/**
+	 * @notice The pool value index => Total value = totalSupply() * valueIndex;
+	 * Decimal 18
+	 */
+	uint256 public valueIndex;
+
+	/**
+	 * @notice The trade type: 0 => long, 1 => short
+	 */
+	enum TradeType {
+		long,
+		short
+	}
+
+	/**
+	 * @notice Base token Decimal
+	 */
+	uint8 public baseTokenDecimal;
+
+	/**
 	 * @notice Setup the maximum number of accounts on pending pool
 	 * @param maxAccounts_ The maximum number of accounts on pending pool
 	 */
@@ -93,6 +112,13 @@ abstract contract ITradePool {
 	 * @return account number
 	 */
 	function getAccountsOnPendingPool() external view virtual returns (address[] memory);
+
+	/**
+	 * @notice Redeem shares and withdraw asset with baseToken and tradeToken
+	 * @param shares The number of shares(LP token)
+	 * @return (The withdraw number of baseToken, The withdraw number of tradeToken)
+	 */
+	function redeem(uint256 shares) external virtual returns (uint256, uint256);
 
 	/**
 	 * @notice The open long method. Sell baseToken and buy tradeToken
