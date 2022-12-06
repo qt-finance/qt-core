@@ -33,6 +33,18 @@ const UniSwapRouter = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
 
 export async function setupTradePoolOnForkMainnet() {
 	await network.provider.request({
+		method: 'hardhat_reset',
+		params: [
+			{
+				forking: {
+					jsonRpcUrl: `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_FORK_API_KEY}`,
+					blockNumber: 15815693,
+				},
+			},
+		],
+	});
+
+	await network.provider.request({
 		method: 'hardhat_impersonateAccount',
 		params: [BinanceWallet],
 	});

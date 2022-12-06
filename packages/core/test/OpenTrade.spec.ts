@@ -114,7 +114,7 @@ describe('TradePool Advenced method', () => {
 			const path = [USDCAddress, 500, WETHAddress];
 
 			const sellAmount = 5000n * USDC_DECIMAL;
-			const amounOutMinimum = 3711180507490324827n;
+			const amounOutMinimum = 3711196401632008557n;
 
 			await tradePool
 				.connect(trader)
@@ -150,7 +150,7 @@ describe('TradePool Advenced method', () => {
 			const path = [USDCAddress, 500, WETHAddress];
 
 			const sellAmount = 5000n * USDC_DECIMAL;
-			const amounOutMinimum = 3711148735331249393n;
+			const amounOutMinimum = 3711196401632008557n;
 
 			await tradePool
 				.connect(trader)
