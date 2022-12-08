@@ -1,13 +1,13 @@
 import React from 'react';
 
-import Navigation from 'components/molecules/Navigation';
+// import Navigation from 'components/molecules/Navigation';
 
 import styles from './index.module.css';
 
 const Header: React.FC = () => (
 	<header className={styles.header}>
-		<h2>This is header</h2>
-		<Navigation />
+		<h2>QT Finance</h2>
+		{/* <Navigation /> */}
 	</header>
 );
 

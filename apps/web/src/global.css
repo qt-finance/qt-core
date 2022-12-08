@@ -1,4 +1,150 @@
 /*
  * This is for global css usage.
  */
+@import 'https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap';
+@import 'https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap';
 @import '../config/palette.css';
+
+:root {
+	font-family: Lato, 'Noto Sans TC', PingFangTC-Regular, 'Microsoft JhengHei', sans-serif;
+	font-size: 16px;
+	line-height: 24px;
+	font-weight: 400;
+	color-scheme: light dark;
+	color: var(--dark);
+	background-color: #fff;
+	font-synthesis: none;
+	text-rendering: optimizelegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-size-adjust: 100%;
+}
+
+* {
+	outline: none;
+	box-sizing: border-box;
+}
+
+a {
+	font-weight: 500;
+	color: var(--primary);
+	text-decoration: inherit;
+}
+
+a:hover {
+	color: #535bf2;
+}
+
+body {
+	display: flex;
+	width: 100%;
+}
+
+:global(#content) {
+	width: 100%;
+}
+
+h1 {
+	font-size: 36px;
+	font-weight: 500;
+	font-stretch: normal;
+	font-style: normal;
+	line-height: 1.5;
+	letter-spacing: 4px;
+	color: var(--dark);
+	margin: 0;
+}
+
+h2 {
+	font-size: 32px;
+	font-weight: 500;
+	font-stretch: normal;
+	font-style: normal;
+	line-height: 1.25;
+	letter-spacing: 4px;
+	color: var(--dark);
+	margin: 0;
+}
+
+h3 {
+	font-size: 28px;
+	font-weight: 500;
+	font-stretch: normal;
+	font-style: normal;
+	line-height: 1.21;
+	letter-spacing: 2.5px;
+	color: var(--dark);
+	margin: 0;
+}
+
+h4 {
+	font-size: 24px;
+	font-weight: normal;
+	font-stretch: normal;
+	font-style: normal;
+	line-height: 1.17;
+	letter-spacing: 2.5px;
+	color: var(--dark);
+	margin: 0;
+}
+
+h5 {
+	font-size: 20px;
+	font-weight: normal;
+	font-stretch: normal;
+	font-style: normal;
+	line-height: 1.5;
+	letter-spacing: 2.5px;
+	color: var(--dark);
+	margin: 0;
+}
+
+p {
+	font-size: 14px;
+	font-weight: normal;
+	font-stretch: normal;
+	font-style: normal;
+	line-height: 1.71;
+	letter-spacing: 1.2px;
+	color: var(--dark);
+	margin: 0;
+}
+
+button {
+	border-radius: 8px;
+	border: 1px solid transparent;
+	padding: 0.6em 1.2em;
+	font-size: 1em;
+	font-weight: 500;
+	font-family: inherit;
+	background-color: var(--primary);
+	cursor: pointer;
+	transition: border-color 0.25s;
+	color: var(--dark);
+}
+
+button:hover {
+	border-color: var(--dark);
+}
+
+button:focus,
+button:focus-visible {
+	/* outline: 4px auto -webkit-focus-ring-color; */
+	outline: none;
+}
+
+input {
+	border-radius: 8px;
+	border: 1px solid transparent;
+	padding: 0.6em 1.2em;
+	font-size: 1em;
+	font-weight: 500;
+	font-family: inherit;
+	background-color: var(--primary);
+	transition: border-color 0.25s;
+	color: var(--dark);
+}
+
+input:hover {
+	border-color: var(--dark);
+}
