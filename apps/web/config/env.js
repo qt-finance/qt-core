@@ -1,3 +1,7 @@
+import * as dotenv from 'dotenv';
+
+dotenv.config({ path: '../../.env' });
+
 export default {
 	// Set production mode or development mode
 	NODE_ENV: process.env.NODE_ENV && `"${process.env.NODE_ENV}"`,
