@@ -12,6 +12,7 @@
 	"scripts": {
 		"build": "yarn workspace @qt-core/core run build && cp -r ./packages/core/artifacts ./apps/app/",
 		"commit": "git-cz",
+		"test": "yarn workspace @qt-core/core run test",
 		"release": "standard-version"
 	},
 	"config": {
