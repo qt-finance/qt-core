@@ -5,9 +5,9 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 // A modern alternative to CSS resets
-import 'normalize.css?node';
+import 'normalize.css';
 // Global css setting
-import './global.css';
+import './global.module.css';
 
 import Router from 'layouts/Router';
 

@@ -104,7 +104,7 @@ export default {
 				},
 			},
 			{
-				test: /\.css$/,
+				test: /\.module.css$/,
 				include: [path.join(__dirname, 'src'), path.join(__dirname, 'config')],
 				use: [
 					'style-loader',
@@ -150,8 +150,7 @@ export default {
 			},
 			{
 				test: /\.css$/,
-				// include: path.join(__dirname, 'node_modules'),
-				resourceQuery: /node/,
+				include: path.join(__dirname, '..', '..', 'node_modules'),
 				use: ['style-loader', { loader: 'css-loader', options: { sourceMap: true } }],
 			},
 			{
