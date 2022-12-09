@@ -10,9 +10,9 @@
 	font-size: 16px;
 	line-height: 24px;
 	font-weight: 400;
-	color-scheme: light dark;
-	color: var(--dark);
-	background-color: #fff;
+	color-scheme: dark;
+	color: var(--primary);
+	background-color: var(--dark);
 	font-synthesis: none;
 	text-rendering: optimizelegibility;
 	-webkit-font-smoothing: antialiased;
@@ -51,7 +51,7 @@ h1 {
 	font-style: normal;
 	line-height: 1.5;
 	letter-spacing: 4px;
-	color: var(--dark);
+	color: var(--primary);
 	margin: 0;
 }
 
@@ -62,7 +62,7 @@ h2 {
 	font-style: normal;
 	line-height: 1.25;
 	letter-spacing: 4px;
-	color: var(--dark);
+	color: var(--primary);
 	margin: 0;
 }
 
@@ -73,7 +73,7 @@ h3 {
 	font-style: normal;
 	line-height: 1.21;
 	letter-spacing: 2.5px;
-	color: var(--dark);
+	color: var(--primary);
 	margin: 0;
 }
 
@@ -84,7 +84,7 @@ h4 {
 	font-style: normal;
 	line-height: 1.17;
 	letter-spacing: 2.5px;
-	color: var(--dark);
+	color: var(--primary);
 	margin: 0;
 }
 
@@ -95,7 +95,7 @@ h5 {
 	font-style: normal;
 	line-height: 1.5;
 	letter-spacing: 2.5px;
-	color: var(--dark);
+	color: var(--primary);
 	margin: 0;
 }
 
@@ -106,7 +106,7 @@ p {
 	font-style: normal;
 	line-height: 1.71;
 	letter-spacing: 1.2px;
-	color: var(--dark);
+	color: var(--primary);
 	margin: 0;
 }
 
@@ -117,14 +117,14 @@ button {
 	font-size: 1em;
 	font-weight: 500;
 	font-family: inherit;
-	background-color: var(--primary);
+	background-color: var(--dark);
 	cursor: pointer;
 	transition: border-color 0.25s;
-	color: var(--dark);
+	color: var(--primary);
 }
 
 button:hover {
-	border-color: var(--dark);
+	border-color: var(--primary);
 }
 
 button:focus,

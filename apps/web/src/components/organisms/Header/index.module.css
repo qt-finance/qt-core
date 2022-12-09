@@ -1,7 +1,8 @@
 .header {
 	display: flex;
 	width: 100%;
-	color: var(--dark);
-	background-color: var(--background);
+	color: var(--primary);
+	background-color: var(--dark);
 	padding: 20px 40px;
+	border-bottom: 1px solid var(--primary);
 }
