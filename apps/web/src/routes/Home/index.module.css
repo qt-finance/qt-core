@@ -1,16 +1,28 @@
-.welcome {
+.home {
 	display: flex;
-	align-items: center;
 	justify-content: center;
-	width: 200px;
-	height: 200px;
-	border-radius: 100px;
-	color: var(--secondary);
-	background-color: var(--standard);
-	margin: 0 auto;
-	margin-top: 200px;
-	margin-bottom: 200px;
-	line-height: 32px;
-	font-weight: 300;
-	text-align: center;
+	align-items: center;
+	flex-direction: column;
+	padding: 20px;
+
+	& > .section {
+		display: flex;
+		align-items: center;
+		padding: 0 16px;
+		width: 100%;
+		max-width: 600px;
+		height: 80px;
+		border: 1px solid var(--primary);
+		background-color: var(--dark);
+		border-radius: 8px;
+		margin-bottom: 20px;
+
+		& > .name {
+			margin-right: 10px;
+		}
+
+		& > button {
+			margin-left: auto;
+		}
+	}
 }
