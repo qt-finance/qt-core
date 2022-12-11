@@ -17,7 +17,7 @@ import { ISwapRouter } from '@uniswap/v3-periphery/contracts/interfaces/ISwapRou
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { ERC20 } from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 
-import { ITradePool } from './ITradePool.sol';
+import { ITradePool } from './interface/ITradePool.sol';
 
 // import 'hardhat/console.sol';
 
