@@ -11,6 +11,7 @@ import {
 
 import { IQuantroller } from './interface/IQuantroller.sol';
 import { IPriceOracle } from './interface/IPriceOracle.sol';
+import { ITradePool } from './interface/ITradePool.sol';
 
 contract Quantroller is Initializable, OwnableUpgradeable, UUPSUpgradeable, IQuantroller {
 	function initialize(IPriceOracle oracle_) public initializer {
@@ -28,5 +29,19 @@ contract Quantroller is Initializable, OwnableUpgradeable, UUPSUpgradeable, IQua
 
 	function setPriceOracle(IPriceOracle oracle_) public onlyOwner {
 		oracle = oracle_;
+	}
+
+	function addMarket(ITradePool tradePool) external onlyOwner {
+		require(tradePool.isTradePool(), 'Must be a TradePool');
+
+		Market storage market = markets[address(tradePool)];
+		market.isListed = true;
+	}
+
+	function removeMarket(ITradePool tradePool) external onlyOwner {
+		require(tradePool.isTradePool(), 'Must be a TradePool');
+
+		Market storage market = markets[address(tradePool)];
+		market.isListed = false;
 	}
 }

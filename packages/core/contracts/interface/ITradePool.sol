@@ -71,6 +71,11 @@ abstract contract ITradePool {
 	uint8 public baseTokenDecimal;
 
 	/**
+	 * @notice Indicator that this is a TradePool contract (for inspection)
+	 */
+	bool public constant isTradePool = true;
+
+	/**
 	 * @notice Setup the maximum number of accounts on pending pool
 	 * @param maxAccounts_ The maximum number of accounts on pending pool
 	 */
