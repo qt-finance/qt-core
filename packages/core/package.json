@@ -12,7 +12,7 @@
 		"verify": "hardhat verify --network goerli",
 		"test": "npm run test:basic && npm run test:fork",
 		"test:basic": "hardhat test test/TradePool.spec.ts",
-		"test:fork": "cross-env HARDHAT_FORK_TEST=1 hardhat test test/OpenTrade.spec.ts",
+		"test:fork": "cross-env HARDHAT_FORK_TEST=1 hardhat test test/fork/*.spec.ts",
 		"node:local": "hardhat node",
 		"watch": "remixd -s . --remix-ide https://remix.ethereum.org",
 		"clean": "rm -rf .deps && rm -rf artifacts && rm -rf cache && rm -rf web3-types && rm -rf test-types"
