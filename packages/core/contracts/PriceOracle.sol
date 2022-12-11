@@ -10,10 +10,11 @@ import { TickMath } from './uniswap/TickMath.sol';
 import { IPriceOracle } from './interface/IPriceOracle.sol';
 
 contract PriceOracle is IPriceOracle {
-	function getSqrtTwapX96(
-		address uniswapV3Pool,
-		uint32 twapInterval
-	) public view returns (uint160 sqrtPriceX96) {
+	function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval)
+		public
+		view
+		returns (uint160 sqrtPriceX96)
+	{
 		if (twapInterval == 0) {
 			// return the current price if twapInterval == 0
 			(sqrtPriceX96, , , , , , ) = IUniswapV3Pool(uniswapV3Pool).slot0();
@@ -37,20 +38,23 @@ contract PriceOracle is IPriceOracle {
 	// 	return Math.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
 	// }
 
-	function sqrtPriceX96ToUint(
-		uint160 sqrtPriceX96,
-		uint8 decimalsToken0
-	) internal pure returns (uint256) {
+	function sqrtPriceX96ToUint(uint160 sqrtPriceX96, uint8 decimalsToken0)
+		internal
+		pure
+		returns (uint256)
+	{
 		uint256 numerator1 = uint256(sqrtPriceX96) * uint256(sqrtPriceX96);
-		uint256 numerator2 = 10 ** decimalsToken0;
+		uint256 numerator2 = 10**decimalsToken0;
 		return Math.mulDiv(numerator1, numerator2, 1 << 192);
 	}
 
 	/// @inheritdoc IPriceOracle
-	function getPrice(
-		address tokenIn,
-		address tokenOut
-	) external view override returns (uint256 price) {
+	function getPrice(address tokenIn, address tokenOut)
+		external
+		view
+		override
+		returns (uint256 price)
+	{
 		uint24 fee = 5;
 		IUniswapV3Pool pool = IUniswapV3Pool(
 			IUniswapV3Factory(0x1F98431c8aD98523631AE4a59f267346ea31F984).getPool(

@@ -20,7 +20,17 @@ describe('TradePool Advenced method', () => {
 			expect(await tradePool.tradeToken()).to.be.equal(wethToken.address);
 		});
 	});
-
+	it('get oracle', async () => {
+	
+		const Oracle = await ethers.getContractFactory('PriceOracle');
+		const PriceOracle = (await Oracle.deploy());
+		const price=await PriceOracle.getSqrtTwapX96("0x4e68Ccd3E89f51C3074ca5072bbAC773960dFa36",100);
+		console.log("get roacle",price);
+		console.log("get roacle",Math.sqrt(1343.83)*2**96);
+		console.log("get roacle",await PriceOracle.getPriceX96FromSqrtPriceX96(price));
+		console.log("get roacle",1343.83*2**96);
+		
+	});
 	describe('Trade', () => {
 		async function setupTradeFixture() {
 			const TradePool = await setupTradePoolOnForkMainnet();
