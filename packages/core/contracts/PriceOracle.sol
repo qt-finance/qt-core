@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.17;
 
-import '@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol';
-import '@uniswap/v3-core/contracts/libraries/TickMath.sol';
-import '@uniswap/v3-core/contracts/libraries/FixedPoint96.sol';
+import { IUniswapV3Pool } from '@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol';
+import { FixedPoint96 } from '@uniswap/v3-core/contracts/libraries/FixedPoint96.sol';
+
+// import '@uniswap/v3-core/contracts/libraries/TickMath.sol';
+
+import { TickMath } from './uniswap/TickMath.sol';
 
 error PRBMath__MulDivOverflow(uint256 x, uint256 y, uint256 denominator);
 
