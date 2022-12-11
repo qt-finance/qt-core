@@ -10,16 +10,23 @@ import {
 } from '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
 
 import { IQuantroller } from './interface/IQuantroller.sol';
+import { IPriceOracle } from './interface/IPriceOracle.sol';
 
 contract Quantroller is Initializable, OwnableUpgradeable, UUPSUpgradeable, IQuantroller {
-	function initialize() public initializer {
+	function initialize(IPriceOracle oracle_) public initializer {
 		__Ownable_init();
 		__UUPSUpgradeable_init();
 
-		__init();
+		__init(oracle_);
 	}
 
-	function __init() internal initializer {}
+	function __init(IPriceOracle oracle_) internal initializer {
+		oracle = oracle_;
+	}
 
 	function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+
+	function setPriceOracle(IPriceOracle oracle_) public onlyOwner {
+		oracle = oracle_;
+	}
 }

@@ -4,12 +4,14 @@ pragma solidity ^0.8.17;
 import { IUniswapV3Pool } from '@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol';
 import { FixedPoint96 } from '@uniswap/v3-core/contracts/libraries/FixedPoint96.sol';
 import { Math } from '@openzeppelin/contracts/utils/math/Math.sol';
+import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 // import '@uniswap/v3-core/contracts/libraries/TickMath.sol';
 
 import { TickMath } from './uniswap/TickMath.sol';
+import { IPriceOracle } from './interface/IPriceOracle.sol';
 
-contract PriceOracle {
+contract PriceOracle is IPriceOracle {
 	function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval)
 		public
 		view
@@ -39,5 +41,10 @@ contract PriceOracle {
 		returns (uint256 priceX96)
 	{
 		return Math.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
+	}
+
+	/// @inheritdoc IPriceOracle
+	function getPrice(IERC20 token) external view override returns (uint256) {
+		return 0;
 	}
 }
