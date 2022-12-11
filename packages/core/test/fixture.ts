@@ -4,7 +4,8 @@ import { ERC20, TestERC20, TradePool } from '../test-types';
 
 export async function setupTradePool() {
 	const [owner, ...otherAccount] = await ethers.getSigners();
-
+	const Oracle = await ethers.getContractFactory('PriceOracle');
+	const PriceOracle = (await Oracle.deploy());
 	const TestERC20Contract = await ethers.getContractFactory('TestERC20');
 
 	const baseToken = (await TestERC20Contract.deploy('BaseToken', 'BT')) as TestERC20;
@@ -28,7 +29,7 @@ export const USDC_DECIMAL = 10n ** 6n;
 const BinanceWallet = '0xF977814e90dA44bFA03b6295A0616a897441aceC';
 export const USDCAddress = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
 export const WETHAddress = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
-
+	
 const UniSwapRouter = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
 
 export async function setupTradePoolOnForkMainnet() {
@@ -68,6 +69,9 @@ export async function setupTradePoolOnForkMainnet() {
 	await tradePool.setMaxAccountsOnPendingPool(10);
 	await tradePool.setSwapRouter(UniSwapRouter);
 	await tradePool.setTrader(trader.address);
+
+
+
 
 	return { tradePool, owner, trader, user1, otherAccount, usdcToken, wethToken };
 }
