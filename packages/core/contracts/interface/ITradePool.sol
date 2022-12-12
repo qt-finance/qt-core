@@ -13,9 +13,14 @@ abstract contract ITradePool {
 	IQuantroller public quantroller;
 
 	/**
-	 * @notice Trade commission
+	 * @notice Trader's commission from user redeem. Default = 8%
 	 */
-	uint256 commissionRatio;
+	uint256 commissionRatioForTrader;
+
+	/**
+	 * @notice Owner's commission from user redeem. Default = 4%
+	 */
+	uint256 commissionRatioForOwner;
 
 	/**
 	 * @notice Base token, only can deposit this token
@@ -104,6 +109,16 @@ abstract contract ITradePool {
 	 * @param trader_ The trader
 	 */
 	function setTrader(address trader_) external virtual;
+
+	/**
+	 * TODO
+	 */
+	function setCommissionRatioForTrader(uint256 ratio_) external virtual;
+
+	/**
+	 * TODO
+	 */
+	function setCommissionRatioForOwner(uint256 ratio_) external virtual;
 
 	/**
 	 * @notice Deposit base token into pending pool

@@ -54,6 +54,9 @@ contract TradePool is
 		baseToken = baseToken_;
 		baseTokenDecimal = baseTokenDecimal_;
 		tradeToken = tradeToken_;
+
+		commissionRatioForTrader = 8 * 1e16;
+		commissionRatioForOwner = 4 * 1e16;
 	}
 
 	function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
@@ -76,6 +79,16 @@ contract TradePool is
 	/// @inheritdoc ITradePool
 	function setTrader(address trader_) external override onlyOwner {
 		trader = trader_;
+	}
+
+	/// @inheritdoc ITradePool
+	function setCommissionRatioForTrader(uint256 ratio_) external override onlyOwner {
+		commissionRatioForTrader = ratio_;
+	}
+
+	/// @inheritdoc ITradePool
+	function setCommissionRatioForOwner(uint256 ratio_) external override onlyOwner {
+		commissionRatioForOwner = ratio_;
 	}
 
 	/// @inheritdoc ITradePool
@@ -166,16 +179,16 @@ contract TradePool is
 		uint256 sharesBalance = totalSupply();
 
 		if (valueIndex > redeemAccountData.valueIndex) {
-			// Earn Ratio = (valueIndex - redeemAccountData.valueIndex) / valueIndex
-			// Commission = Earn Ratio * 0.12 * Shares
-			uint256 commission = ((valueIndex - redeemAccountData.valueIndex) *
-				commissionRatio *
-				shares) / (valueIndex * 100);
+			// Commission = (valueIndex - redeemAccountData.valueIndex) * shares / valueIndex
+			// commission For Trader = Commission * 8%
+			// commission For Owner = Commission * 4%
+			uint256 commission = ((valueIndex - redeemAccountData.valueIndex) * shares) /
+				valueIndex;
 
-			shares -= commission;
+			uint256 commissionForTrader = (commission * commissionRatioForTrader) / 1e18;
+			uint256 commissionForOwner = (commission * commissionRatioForOwner) / 1e18;
 
-			uint256 commissionForTrader = (commission * 2) / 3;
-			uint256 commissionForOwner = commission - commissionForTrader;
+			shares -= (commissionForTrader + commissionForOwner);
 
 			_transfer(msg.sender, trader, commissionForTrader);
 			_transfer(msg.sender, owner(), commissionForOwner);
