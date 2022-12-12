@@ -8,8 +8,11 @@ import { Math } from '@openzeppelin/contracts/utils/math/Math.sol';
 import { ERC20 } from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import { TickMath } from './uniswap/TickMath.sol';
 import { IPriceOracle } from './interface/IPriceOracle.sol';
+import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
 
-contract PriceOracle is IPriceOracle {
+contract PriceOracle is IPriceOracle, Ownable {
+	mapping(address => mapping(address => address)) public Pool;
+
 	function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval)
 		public
 		view
@@ -38,6 +41,15 @@ contract PriceOracle is IPriceOracle {
 	// 	return Math.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
 	// }
 
+	function addPool(
+		address tokenIn,
+		address tokenOut,
+		address _pool
+	) external onlyOwner {
+		Pool[tokenIn][tokenOut] = _pool;
+		Pool[tokenOut][tokenIn] = _pool;
+	}
+
 	function sqrtPriceX96ToUint(uint160 sqrtPriceX96, uint8 decimalsToken0)
 		internal
 		pure
@@ -55,14 +67,7 @@ contract PriceOracle is IPriceOracle {
 		override
 		returns (uint256 price)
 	{
-		uint24 fee = 5;
-		IUniswapV3Pool pool = IUniswapV3Pool(
-			IUniswapV3Factory(0x1F98431c8aD98523631AE4a59f267346ea31F984).getPool(
-				tokenIn,
-				tokenOut,
-				fee
-			)
-		);
+		IUniswapV3Pool pool = IUniswapV3Pool(Pool[tokenIn][tokenOut]);
 		return sqrtPriceX96ToUint(getSqrtTwapX96(address(pool), 100), ERC20(tokenIn).decimals());
 		// (uint160 sqrtPriceX96, , , , , , ) = pool.slot0(); //(1e18)
 		// return (uint(sqrtPriceX96) * (uint(sqrtPriceX96)) * (10**uint256(ERC20(tokenIn).decimals()))) >> (96 * 2);
