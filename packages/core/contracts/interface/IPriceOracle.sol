@@ -12,5 +12,7 @@ abstract contract IPriceOracle {
 	 * @return The token price (scaled by 1e18).
 	 *  Zero means the price is unavailable.
 	 */
-	function getPrice(IERC20 token) external view virtual returns (uint256);
+	
+	function getPrice(address tokenIn, address tokenOut) external view virtual returns (uint256 price);
+
 }
