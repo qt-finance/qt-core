@@ -8,9 +8,14 @@ abstract contract IPriceOracle {
 
 	/**
 	 * @notice Get the token price
-	 * @param token The token to get the price of
-	 * @return The token price (scaled by 1e18).
+	 * @param tokenIn The contract address of either tokenIn or tokenOut
+	 * @param tokenOut The contract address of the other token
+	 * @return price The tokenIn price (scaled by 1e18).
 	 *  Zero means the price is unavailable.
 	 */
-	function getPrice(IERC20 token) external view virtual returns (uint256);
+
+	function getPrice(
+		address tokenIn,
+		address tokenOut
+	) external view virtual returns (uint256 price);
 }
