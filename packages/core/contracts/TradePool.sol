@@ -18,6 +18,7 @@ import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { ERC20 } from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 
 import { ITradePool } from './interface/ITradePool.sol';
+import { IQuantroller } from './interface/IQuantroller.sol';
 
 // import 'hardhat/console.sol';
 
@@ -29,6 +30,7 @@ contract TradePool is
 	ITradePool
 {
 	function initialize(
+		IQuantroller quantroller_,
 		string memory name_,
 		string memory symbol_,
 		IERC20 baseToken_,
@@ -39,14 +41,16 @@ contract TradePool is
 		__UUPSUpgradeable_init();
 		__ERC20_init(name_, symbol_);
 
-		__init(baseToken_, baseTokenDecimal_, tradeToken_);
+		__init(quantroller_, baseToken_, baseTokenDecimal_, tradeToken_);
 	}
 
 	function __init(
+		IQuantroller quantroller_,
 		IERC20 baseToken_,
 		uint8 baseTokenDecimal_,
 		IERC20 tradeToken_
 	) internal initializer {
+		quantroller = quantroller_;
 		baseToken = baseToken_;
 		baseTokenDecimal = baseTokenDecimal_;
 		tradeToken = tradeToken_;
@@ -154,7 +158,28 @@ contract TradePool is
 		require(shares > 0, 'TradePool: Must > 0');
 		require(shares <= balanceOf(redeemAccount), 'TradePool: Must < balance of sender');
 
+		// Update ValueIndex
+		_updateValueIndex();
+
+		AccountData memory redeemAccountData = accountData[redeemAccount];
+
 		uint256 sharesBalance = totalSupply();
+
+		if (valueIndex > redeemAccountData.valueIndex) {
+			// Earn Ratio = (valueIndex - redeemAccountData.valueIndex) / valueIndex
+			// Commission = Earn Ratio * 0.12 * Shares
+			uint256 commission = ((valueIndex - redeemAccountData.valueIndex) *
+				commissionRatio *
+				shares) / (valueIndex * 100);
+
+			shares -= commission;
+
+			uint256 commissionForTrader = (commission * 2) / 3;
+			uint256 commissionForOwner = commission - commissionForTrader;
+
+			_transfer(msg.sender, trader, commissionForTrader);
+			_transfer(msg.sender, owner(), commissionForOwner);
+		}
 
 		_burn(redeemAccount, shares);
 
@@ -351,5 +376,16 @@ contract TradePool is
 		toAccountData.valueIndex =
 			(fromValueIndex * amount + toValueIndex * toBalance) /
 			(amount + toBalance);
+	}
+
+	function _updateValueIndex() internal {
+		uint256 tradeBalance = tradeToken.balanceOf(address(this));
+		uint256 baseBalance = baseToken.balanceOf(address(this));
+		uint256 sharesBalance = totalSupply();
+
+		uint256 tradeValue = quantroller.getPrice(address(tradeToken), address(baseToken)) *
+			tradeBalance;
+
+		valueIndex = (tradeValue + baseBalance) / sharesBalance;
 	}
 }

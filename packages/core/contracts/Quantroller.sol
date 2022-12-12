@@ -48,7 +48,7 @@ contract Quantroller is Initializable, OwnableUpgradeable, UUPSUpgradeable, IQua
 	function getPrice(address tokenIn, address tokenOut)
 		external
 		view
-		virtual
+		override
 		returns (uint256 price)
 	{
 		return oracle.getPrice(tokenIn, tokenOut);

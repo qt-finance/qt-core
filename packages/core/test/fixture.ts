@@ -1,11 +1,26 @@
 import { ethers, upgrades, network } from 'hardhat';
 
-import { ERC20, TestERC20, TradePool } from '../test-types';
+import { ERC20, Quantroller, SimplePriceOracle, TestERC20, TradePool } from '../test-types';
+
+export async function setupQuantrollerPool() {
+	const PriceOracleContract = await ethers.getContractFactory('SimplePriceOracle');
+
+	const priceOracle = (await PriceOracleContract.deploy()) as SimplePriceOracle;
+
+	const QuantrollerContract = await ethers.getContractFactory('Quantroller');
+	const quantroller = (await upgrades.deployProxy(QuantrollerContract, [priceOracle.address], {
+		initializer: 'initialize',
+		kind: 'uups',
+	})) as Quantroller;
+
+	return { quantroller, priceOracle };
+}
 
 export async function setupTradePool() {
 	const [owner, ...otherAccount] = await ethers.getSigners();
-	const Oracle = await ethers.getContractFactory('PriceOracle');
-	const PriceOracle = (await Oracle.deploy());
+
+	const { quantroller, priceOracle } = await setupQuantrollerPool();
+
 	const TestERC20Contract = await ethers.getContractFactory('TestERC20');
 
 	const baseToken = (await TestERC20Contract.deploy('BaseToken', 'BT')) as TestERC20;
@@ -14,14 +29,14 @@ export async function setupTradePool() {
 	const TradePoolContract = await ethers.getContractFactory('TradePool');
 	const tradePool = (await upgrades.deployProxy(
 		TradePoolContract,
-		['qTT-BT', 'TT-BT trade pool', baseToken.address, 18, tradeToken.address],
+		[quantroller.address, 'qTT-BT', 'TT-BT trade pool', baseToken.address, 18, tradeToken.address],
 		{
 			initializer: 'initialize',
 			kind: 'uups',
 		},
 	)) as TradePool;
 
-	return { tradePool, owner, otherAccount, baseToken, tradeToken };
+	return { tradePool, owner, otherAccount, baseToken, tradeToken, quantroller, priceOracle };
 }
 
 export const USDC_DECIMAL = 10n ** 6n;
@@ -29,7 +44,7 @@ export const USDC_DECIMAL = 10n ** 6n;
 const BinanceWallet = '0xF977814e90dA44bFA03b6295A0616a897441aceC';
 export const USDCAddress = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
 export const WETHAddress = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
-	
+
 const UniSwapRouter = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
 
 export async function setupTradePoolOnForkMainnet() {
@@ -53,13 +68,22 @@ export async function setupTradePoolOnForkMainnet() {
 
 	const [owner, trader, ...otherAccount] = await ethers.getSigners();
 
+	const { quantroller, priceOracle } = await setupQuantrollerPool();
+
 	const usdcToken = (await ethers.getContractAt('ERC20', USDCAddress)) as ERC20;
 	const wethToken = (await ethers.getContractAt('ERC20', WETHAddress)) as ERC20;
 
 	const TradePoolContract = await ethers.getContractFactory('TradePool');
 	const tradePool = (await upgrades.deployProxy(
 		TradePoolContract,
-		['qWETH-USDC', 'WETH-USDC trade pool', usdcToken.address, 18, wethToken.address],
+		[
+			quantroller.address,
+			'qWETH-USDC',
+			'WETH-USDC trade pool',
+			usdcToken.address,
+			18,
+			wethToken.address,
+		],
 		{
 			initializer: 'initialize',
 			kind: 'uups',
@@ -70,8 +94,15 @@ export async function setupTradePoolOnForkMainnet() {
 	await tradePool.setSwapRouter(UniSwapRouter);
 	await tradePool.setTrader(trader.address);
 
-
-
-
-	return { tradePool, owner, trader, user1, otherAccount, usdcToken, wethToken };
+	return {
+		tradePool,
+		owner,
+		trader,
+		user1,
+		otherAccount,
+		usdcToken,
+		wethToken,
+		quantroller,
+		priceOracle,
+	};
 }

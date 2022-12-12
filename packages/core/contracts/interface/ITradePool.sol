@@ -4,7 +4,19 @@ pragma solidity ^0.8.17;
 import { ISwapRouter } from '@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
+import { IQuantroller } from './IQuantroller.sol';
+
 abstract contract ITradePool {
+	/**
+	 * @notice QT Controller. Controller market/oracle
+	 */
+	IQuantroller public quantroller;
+
+	/**
+	 * @notice Trade commission
+	 */
+	uint256 commissionRatio;
+
 	/**
 	 * @notice Base token, only can deposit this token
 	 */
