@@ -6,9 +6,6 @@ import { IUniswapV3Factory } from '@uniswap/v3-core/contracts/interfaces/IUniswa
 import { FixedPoint96 } from '@uniswap/v3-core/contracts/libraries/FixedPoint96.sol';
 import { Math } from '@openzeppelin/contracts/utils/math/Math.sol';
 import { ERC20 } from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-
-// import '@uniswap/v3-core/contracts/libraries/TickMath.sol';
-
 import { TickMath } from './uniswap/TickMath.sol';
 import { IPriceOracle } from './interface/IPriceOracle.sol';
 
@@ -17,7 +14,6 @@ contract PriceOracle is IPriceOracle {
 		address uniswapV3Pool,
 		uint32 twapInterval
 	) public view returns (uint160 sqrtPriceX96) {
-		// address uniswapV3Pool= 0x4e68Ccd3E89f51C3074ca5072bbAC773960dFa36;
 		if (twapInterval == 0) {
 			// return the current price if twapInterval == 0
 			(sqrtPriceX96, , , , , , ) = IUniswapV3Pool(uniswapV3Pool).slot0();
@@ -35,10 +31,19 @@ contract PriceOracle is IPriceOracle {
 		}
 	}
 
-	function getPriceX96FromSqrtPriceX96(
-		uint160 sqrtPriceX96
-	) public pure returns (uint256 priceX96) {
-		return Math.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
+	// function getPriceX96FromSqrtPriceX96(
+	// 	uint160 sqrtPriceX96
+	// ) public pure returns (uint256 priceX96) {
+	// 	return Math.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
+	// }
+
+	function sqrtPriceX96ToUint(
+		uint160 sqrtPriceX96,
+		uint8 decimalsToken0
+	) internal pure returns (uint256) {
+		uint256 numerator1 = uint256(sqrtPriceX96) * uint256(sqrtPriceX96);
+		uint256 numerator2 = 10 ** decimalsToken0;
+		return Math.mulDiv(numerator1, numerator2, 1 << 192);
 	}
 
 	/// @inheritdoc IPriceOracle
@@ -54,7 +59,8 @@ contract PriceOracle is IPriceOracle {
 				fee
 			)
 		);
-		(uint160 sqrtPriceX96, , , , , , ) = pool.slot0(); //(1e18)
-		return (uint(sqrtPriceX96) * (uint(sqrtPriceX96)) * (10**ERC20(tokenIn).decimals)) >> (96 * 2);
+		return sqrtPriceX96ToUint(getSqrtTwapX96(address(pool), 100), ERC20(tokenIn).decimals());
+		// (uint160 sqrtPriceX96, , , , , , ) = pool.slot0(); //(1e18)
+		// return (uint(sqrtPriceX96) * (uint(sqrtPriceX96)) * (10**uint256(ERC20(tokenIn).decimals()))) >> (96 * 2);
 	}
 }
