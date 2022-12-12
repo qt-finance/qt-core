@@ -6,14 +6,19 @@ import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { IPriceOracle } from '../interface/IPriceOracle.sol';
 
 contract SimplePriceOracle is IPriceOracle {
-	mapping(address => uint256) prices;
+	mapping(address => mapping(address => uint256)) prices;
 
 	/// @inheritdoc IPriceOracle
-	function getPrice(IERC20 token) external view override returns (uint256) {
-		return prices[address(token)];
+	function getPrice(address tokenIn, address tokenOut) external view override returns (uint256) {
+		return prices[tokenIn][tokenOut];
 	}
 
-	function setPrice(address token, uint256 price) public {
-		prices[token] = price;
+	function setPrice(
+		address tokenIn,
+		address tokenOut,
+		uint256 price
+	) public {
+		prices[tokenIn][tokenOut] = price;
+		prices[tokenOut][tokenIn] = price;
 	}
 }

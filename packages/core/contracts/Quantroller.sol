@@ -44,4 +44,13 @@ contract Quantroller is Initializable, OwnableUpgradeable, UUPSUpgradeable, IQua
 		Market storage market = markets[address(tradePool)];
 		market.isListed = false;
 	}
+
+	function getPrice(address tokenIn, address tokenOut)
+		external
+		view
+		virtual
+		returns (uint256 price)
+	{
+		return oracle.getPrice(tokenIn, tokenOut);
+	}
 }
