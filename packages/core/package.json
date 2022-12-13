@@ -8,7 +8,7 @@
 		"build:types": "cross-env HARDHAT_WEB3_TYPE=1 hardhat typechain",
 		"build:test-types": "hardhat typechain",
 		"deploy": "hardhat run",
-		"deploy:local": "hardhat run --network localhost scripts/deploy.ts",
+		"deploy:local": "hardhat run --network localhost scripts/deploy-fork.ts",
 		"verify": "hardhat verify --network goerli",
 		"test": "npm run test:basic && npm run test:fork",
 		"test:basic": "hardhat test test/TradePool.spec.ts",
