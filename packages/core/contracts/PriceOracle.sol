@@ -46,13 +46,12 @@ contract PriceOracle is IPriceOracle, Ownable {
 
 	function sqrtPriceX96ToUint(uint160 sqrtPriceX96, uint8 decimalsToken0)
 		internal
-		view
+		pure
 		returns (uint256)
 	{
 		uint256 numerator1 = uint256(sqrtPriceX96) * uint256(sqrtPriceX96);
 		uint256 numerator2 = 10**decimalsToken0;
-		uint256 xx = Math.mulDiv(numerator1, numerator2, 2**96);
-		return Math.mulDiv(numerator1, numerator2, FixedPoint96.Q96);
+		return Math.mulDiv(numerator1, numerator2, 1 << 192);
 	}
 
 	/// @inheritdoc IPriceOracle
