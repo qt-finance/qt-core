@@ -33,6 +33,7 @@
 		"react-dom": "^18.2.0",
 		"regenerator-runtime": "^0.13.9",
 		"universal-router": "^9.1.0",
+		"web3": "^1.8.1",
 		"whatwg-fetch": "^3.6.2"
 	},
 	"devDependencies": {

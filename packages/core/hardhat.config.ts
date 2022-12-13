@@ -32,7 +32,7 @@ const config: HardhatUserConfig = {
 					: [],
 		},
 		hardhat: {
-			chainId: 1,
+			chainId: 31337,
 			blockGasLimit: 1_500_000_000,
 			forking: {
 				url: `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_FORK_API_KEY}`,

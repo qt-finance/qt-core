@@ -1,5 +1,6 @@
 .header {
 	display: flex;
+	justify-content: space-between;
 	width: 100%;
 	color: var(--primary);
 	background-color: var(--dark);
