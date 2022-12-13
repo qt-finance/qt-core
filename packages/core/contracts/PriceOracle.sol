@@ -6,9 +6,10 @@ import { IUniswapV3Factory } from '@uniswap/v3-core/contracts/interfaces/IUniswa
 import { FixedPoint96 } from '@uniswap/v3-core/contracts/libraries/FixedPoint96.sol';
 import { Math } from '@openzeppelin/contracts/utils/math/Math.sol';
 import { ERC20 } from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
+
 import { TickMath } from './uniswap/TickMath.sol';
 import { IPriceOracle } from './interface/IPriceOracle.sol';
-import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
 
 contract PriceOracle is IPriceOracle, Ownable {
 	mapping(address => mapping(address => address)) public Pool;
