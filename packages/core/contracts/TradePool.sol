@@ -165,6 +165,19 @@ contract TradePool is
 	}
 
 	/// @inheritdoc ITradePool
+	function previewValueIndex() public view override returns (uint256) {
+		uint256 tradeBalance = tradeToken.balanceOf(address(this));
+		uint256 baseBalance = baseToken.balanceOf(address(this));
+		uint256 sharesBalance = totalSupply();
+
+		// 1e36, baseTokenPrice is the base => 1e18
+		uint256 tradeValue = (quantroller.getPrice(address(tradeToken), address(baseToken)) *
+			tradeBalance);
+
+		return (tradeValue + _normalizeBaseTokenValue(baseBalance * 1e18)) / sharesBalance;
+	}
+
+	/// @inheritdoc ITradePool
 	function redeem(uint256 shares) external override returns (uint256, uint256) {
 		address redeemAccount = _msgSender();
 
@@ -262,18 +275,6 @@ contract TradePool is
 		return amountOut;
 	}
 
-	function _normalizeShares(uint256 baseTokenAsset) internal view returns (uint256) {
-		if (baseTokenDecimal < 18) {
-			return baseTokenAsset << (18 - baseTokenDecimal);
-		}
-
-		if (baseTokenDecimal > 18) {
-			return baseTokenAsset >> (baseTokenDecimal - 18);
-		}
-
-		return baseTokenAsset;
-	}
-
 	function _rebalance(
 		uint256 baseAmount,
 		uint256 tradeAmount,
@@ -286,7 +287,9 @@ contract TradePool is
 		uint256 tradeBalance = tradeToken.balanceOf(address(this));
 		uint256 baseBalance = baseToken.balanceOf(address(this));
 
-		uint256 currentTotalValue = (tradeBalance * baseAmount) / tradeAmount + baseBalance;
+		uint256 currentTotalValue = _normalizeBaseTokenValue(
+			(tradeBalance * baseAmount) / tradeAmount + baseBalance
+		);
 		uint256 expScale = 1e18;
 		uint256 sharesBalance = totalSupply();
 
@@ -304,7 +307,7 @@ contract TradePool is
 		// First distribute
 		if (sharesBalance == 0) {
 			// Initialize: Shares == Total number of baseToken
-			distributeShares = _normalizeShares(currentTotalValue);
+			distributeShares = currentTotalValue;
 		} else {
 			// For long, buy tradeToken, sell baseToken
 			// For short, buy baseToken, sell tradeToken
@@ -316,19 +319,16 @@ contract TradePool is
 				: baseBalance - baseAmount;
 
 			// Calculate old total value
-			uint256 oldTotalValue = (oldTradeBalance * baseAmount) /
-				tradeAmount +
-				oldBaseBalance -
-				pendingPoolTotal;
+			uint256 oldTotalValue = _normalizeBaseTokenValue(
+				(oldTradeBalance * baseAmount) / tradeAmount + oldBaseBalance - pendingPoolTotal
+			);
 
 			require(
 				currentTotalValue > oldTotalValue,
 				'TradePool: Must more value to distribute LP'
 			);
 
-			distributeShares = _normalizeShares(
-				(sharesBalance * currentTotalValue) / oldTotalValue - sharesBalance
-			);
+			distributeShares = (sharesBalance * currentTotalValue) / oldTotalValue - sharesBalance;
 		}
 
 		valueIndex = (currentTotalValue * expScale) / (distributeShares + sharesBalance);
@@ -391,14 +391,23 @@ contract TradePool is
 			(amount + toBalance);
 	}
 
+	function _normalizeValue(uint256 tokenValue, uint256 decimal) internal pure returns (uint256) {
+		if (decimal < 18) {
+			return tokenValue * 10**(18 - decimal);
+		}
+
+		if (decimal > 18) {
+			return tokenValue / 10**(decimal - 18);
+		}
+
+		return tokenValue;
+	}
+
+	function _normalizeBaseTokenValue(uint256 tokenValue) internal view returns (uint256) {
+		return _normalizeValue(tokenValue, baseTokenDecimal);
+	}
+
 	function _updateValueIndex() internal {
-		uint256 tradeBalance = tradeToken.balanceOf(address(this));
-		uint256 baseBalance = baseToken.balanceOf(address(this));
-		uint256 sharesBalance = totalSupply();
-
-		uint256 tradeValue = quantroller.getPrice(address(tradeToken), address(baseToken)) *
-			tradeBalance;
-
-		valueIndex = (tradeValue + baseBalance) / sharesBalance;
+		valueIndex = previewValueIndex();
 	}
 }

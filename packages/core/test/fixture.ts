@@ -73,6 +73,8 @@ export async function setupTradePoolOnForkMainnet() {
 	const usdcToken = (await ethers.getContractAt('ERC20', USDCAddress)) as ERC20;
 	const wethToken = (await ethers.getContractAt('ERC20', WETHAddress)) as ERC20;
 
+	const USDCDecimal = await usdcToken.decimals();
+
 	const TradePoolContract = await ethers.getContractFactory('TradePool');
 	const tradePool = (await upgrades.deployProxy(
 		TradePoolContract,
@@ -81,7 +83,7 @@ export async function setupTradePoolOnForkMainnet() {
 			'qWETH-USDC',
 			'WETH-USDC trade pool',
 			usdcToken.address,
-			18,
+			USDCDecimal,
 			wethToken.address,
 		],
 		{

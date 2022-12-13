@@ -177,4 +177,10 @@ abstract contract ITradePool {
 		uint256 amountIn,
 		uint256 amountOutMinimum
 	) external virtual returns (uint256);
+
+	/**
+	 * @notice The preview current valueIndex
+	 * @return valueIndex The value of share token
+	 */
+	function previewValueIndex() public view virtual returns (uint256);
 }
