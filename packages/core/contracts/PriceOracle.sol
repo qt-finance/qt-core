@@ -62,7 +62,19 @@ contract PriceOracle is IPriceOracle, Ownable {
 		returns (uint256 price)
 	{
 		IUniswapV3Pool pool = IUniswapV3Pool(Pool[tokenIn][tokenOut]);
-		price = sqrtPriceX96ToUint(getSqrtTwapX96(address(pool), 100), ERC20(tokenIn).decimals());
-		price = price * 10**(18 - ERC20(tokenOut).decimals());
+
+		if (tokenIn == pool.token0()) {
+			price = sqrtPriceX96ToUint(
+				getSqrtTwapX96(address(pool), 100),
+				ERC20(tokenIn).decimals()
+			);
+			return price * 10**(18 - ERC20(tokenOut).decimals());
+		}
+
+		price = sqrtPriceX96ToUint(getSqrtTwapX96(address(pool), 100), ERC20(tokenOut).decimals());
+
+		// For calculate token1 price from token0
+		// https://stackoverflow.com/a/74619134
+		return 10**(18 + ERC20(tokenIn).decimals()) / price;
 	}
 }
