@@ -35,12 +35,6 @@ contract PriceOracle is IPriceOracle, Ownable {
 		}
 	}
 
-	// function getPriceX96FromSqrtPriceX96(
-	// 	uint160 sqrtPriceX96
-	// ) public pure returns (uint256 priceX96) {
-	// 	return Math.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
-	// }
-
 	function addPool(
 		address tokenIn,
 		address tokenOut,
@@ -52,12 +46,13 @@ contract PriceOracle is IPriceOracle, Ownable {
 
 	function sqrtPriceX96ToUint(uint160 sqrtPriceX96, uint8 decimalsToken0)
 		internal
-		pure
+		view
 		returns (uint256)
 	{
 		uint256 numerator1 = uint256(sqrtPriceX96) * uint256(sqrtPriceX96);
 		uint256 numerator2 = 10**decimalsToken0;
-		return Math.mulDiv(numerator1, numerator2, 1 << 192);
+		uint256 xx = Math.mulDiv(numerator1, numerator2, 2**96);
+		return Math.mulDiv(numerator1, numerator2, FixedPoint96.Q96);
 	}
 
 	/// @inheritdoc IPriceOracle
@@ -68,8 +63,7 @@ contract PriceOracle is IPriceOracle, Ownable {
 		returns (uint256 price)
 	{
 		IUniswapV3Pool pool = IUniswapV3Pool(Pool[tokenIn][tokenOut]);
-		return sqrtPriceX96ToUint(getSqrtTwapX96(address(pool), 100), ERC20(tokenIn).decimals());
-		// (uint160 sqrtPriceX96, , , , , , ) = pool.slot0(); //(1e18)
-		// return (uint(sqrtPriceX96) * (uint(sqrtPriceX96)) * (10**uint256(ERC20(tokenIn).decimals()))) >> (96 * 2);
+		price = sqrtPriceX96ToUint(getSqrtTwapX96(address(pool), 100), ERC20(tokenIn).decimals());
+		price = price * 10**(18 - ERC20(tokenOut).decimals());
 	}
 }
