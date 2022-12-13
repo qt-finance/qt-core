@@ -53,7 +53,7 @@ export class WalletModel extends BasicModel<WalletState> {
 	};
 }
 
-export const useConnectWeb3 = () => {
+export const useConnectWeb3 = (): [WalletState, WalletModel] => {
 	const [state, walletModel] = useDI<WalletState, WalletModel>(WalletModel);
 
 	useEffect(() => {
