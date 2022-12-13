@@ -20,7 +20,11 @@ describe('TradePool Advenced method', () => {
 			expect(await tradePool.tradeToken()).to.be.equal(wethToken.address);
 		});
 	});
-
+	it('get oracle', async () => {
+	
+		
+		
+	});
 	describe('Trade', () => {
 		async function setupTradeFixture() {
 			const TradePool = await setupTradePoolOnForkMainnet();
