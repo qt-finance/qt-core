@@ -1,0 +1,15 @@
+.join-modal {
+	display: flex;
+	flex-direction: column;
+	width: 450px;
+
+	& > h3 {
+		margin-bottom: 16px;
+	}
+
+	& > .action {
+		display: flex;
+		justify-content: space-between;
+		margin-top: 16px;
+	}
+}
