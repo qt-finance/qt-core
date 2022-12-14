@@ -3,7 +3,7 @@ import { ethers, network } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 import { PriceOracle } from '../../test-types';
-import { BigNumber } from 'ethers';
+// import { BigNumber } from 'ethers';
 
 describe('Oracle', () => {
 	async function setupOracleFixture() {

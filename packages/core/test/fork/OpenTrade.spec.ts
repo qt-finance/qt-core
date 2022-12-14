@@ -1,9 +1,10 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-
-import { setupTradePoolOnForkMainnet, USDCAddress, USDC_DECIMAL, WETHAddress } from '../fixture';
 import { BigNumber } from 'ethers';
+
+import { setupTradePoolOnForkMainnet, USDC_DECIMAL } from '../fixture';
+import { USDCAddress, WETHAddress } from '../../scripts/fork/config';
 
 describe('TradePool Advenced method', () => {
 	describe('# constructor', () => {
