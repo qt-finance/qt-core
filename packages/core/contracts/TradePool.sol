@@ -170,6 +170,10 @@ contract TradePool is
 		uint256 baseBalance = baseToken.balanceOf(address(this));
 		uint256 sharesBalance = totalSupply();
 
+		if (sharesBalance == 0) {
+			return 0;
+		}
+
 		// 1e36, baseTokenPrice is the base => 1e18
 		uint256 tradeValue = (quantroller.getPrice(address(tradeToken), address(baseToken)) *
 			tradeBalance);
