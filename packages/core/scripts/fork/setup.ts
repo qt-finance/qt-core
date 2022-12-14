@@ -39,6 +39,10 @@ async function main() {
 
 	await usdcToken.connect(binanceBoss).transfer(owner.address, 10000n * 10n ** 6n);
 
+	const balanceUSDC = await usdcToken.balanceOf(owner.address);
+
+	console.log('Owner Balance', balanceUSDC);
+
 	console.log('Setup the account');
 }
 

@@ -2,6 +2,7 @@
 	"name": "@qt-core/core",
 	"version": "1.0.0",
 	"license": "MIT",
+	"main": "index.ts",
 	"scripts": {
 		"compile": "hardhat compile",
 		"build": "npm run compile && npm run build:types",

@@ -5,6 +5,29 @@
 	flex-direction: column;
 	padding: 20px;
 
+	& > .balance {
+		display: flex;
+		flex-direction: column;
+		padding: 16px;
+		width: 100%;
+		max-width: 600px;
+		border: 1px solid var(--primary);
+		background-color: var(--dark);
+		border-radius: 8px;
+		margin-bottom: 20px;
+
+		& > .content {
+			display: flex;
+			flex-wrap: wrap;
+			margin-top: 24px;
+
+			& > div {
+				width: 50%;
+				margin-bottom: 8px;
+			}
+		}
+	}
+
 	& > .section {
 		display: flex;
 		align-items: center;

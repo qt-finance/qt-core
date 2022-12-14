@@ -71,7 +71,8 @@
 
 		/* Advanced Options */
 		"forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
-		"plugins": [{ "name": "typescript-plugin-css-modules" }]
+		"plugins": [{ "name": "typescript-plugin-css-modules" }],
+		"resolveJsonModule": true
 	},
 	"include": ["src/**/*"]
 }

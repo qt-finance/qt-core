@@ -1,5 +1,6 @@
+import { BalanceModel } from './balance';
 import { MemberModel } from './member';
 import { RoutingModel } from './routing';
 import { WalletModel } from './wallet';
 
-export const rootModels = [MemberModel, RoutingModel, WalletModel];
+export const rootModels = [MemberModel, RoutingModel, WalletModel, BalanceModel];
