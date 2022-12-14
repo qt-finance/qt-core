@@ -16,10 +16,12 @@ export interface BalanceState {
 	usdc: {
 		contract: ERC20;
 		balance: bigint;
+		allowance: bigint;
 	};
 	weth: {
 		contract: ERC20;
 		balance: bigint;
+		allowance: bigint;
 	};
 }
 
@@ -44,16 +46,33 @@ export class BalanceModel extends BasicModel<BalanceState> {
 			usdc: {
 				contract: usdcContract,
 				balance: 0n,
+				allowance: 0n,
 			},
 			weth: {
 				contract: wethContract,
 				balance: 0n,
+				allowance: 0n,
 			},
 		};
 	}
 
 	public setupAccount = (account: string) => {
 		this.setState(s => ({ ...s, account }));
+	};
+
+	public getAllowance = async (contract: string) => {
+		const { account, usdc } = this.getState();
+
+		if (account === '') {
+			return;
+		}
+
+		const allowance = await usdc.contract.methods.allowance(account, contract).call();
+
+		this.setState(s => ({
+			...s,
+			usdc: { ...s.usdc, allowance: normalizeNum(BigInt(allowance), 6n) },
+		}));
 	};
 
 	public subscribeContract = () => {

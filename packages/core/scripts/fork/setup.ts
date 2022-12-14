@@ -24,6 +24,10 @@ async function main() {
 		simplePriceOracleAddress,
 	)) as SimplePriceOracle;
 
+	await tradePool.setMaxAccountsOnPendingPool(10);
+	await quantroller.addMarket(tradePool.address);
+	await simplePriceOracle.setPrice(wethToken.address, usdcToken.address, 1347274425519823367182n);
+
 	await network.provider.request({
 		method: 'hardhat_impersonateAccount',
 		params: [BinanceWallet],

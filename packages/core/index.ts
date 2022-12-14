@@ -1,1 +1,1 @@
-export { USDCAddress, WETHAddress } from './scripts/fork/config';
+export { USDCAddress, WETHAddress, tradePoolAddress } from './scripts/fork/config';
