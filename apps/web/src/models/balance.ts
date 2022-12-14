@@ -31,12 +31,12 @@ export class BalanceModel extends BasicModel<BalanceState> {
 		const usdcContract = new web3.eth.Contract(
 			ERC20Abi.abi as AbiItem[],
 			USDCAddress,
-		) as any as ERC20;
+		) as unknown as ERC20;
 
 		const wethContract = new web3.eth.Contract(
 			ERC20Abi.abi as AbiItem[],
 			WETHAddress,
-		) as any as ERC20;
+		) as unknown as ERC20;
 
 		return {
 			web3,
