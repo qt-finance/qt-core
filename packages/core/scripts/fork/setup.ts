@@ -11,6 +11,8 @@ import {
 	WETHAddress,
 } from './config';
 
+const UniSwapRouter = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
+
 async function main() {
 	const { usdcToken, wethToken } = await getForkMainnetContract();
 
@@ -24,17 +26,19 @@ async function main() {
 		simplePriceOracleAddress,
 	)) as SimplePriceOracle;
 
+	const [owner, trader, ...otherAccount] = await ethers.getSigners();
+
 	await tradePool.setMaxAccountsOnPendingPool(10);
 	await quantroller.addMarket(tradePool.address);
 	await simplePriceOracle.setPrice(wethToken.address, usdcToken.address, 1347274425519823367182n);
+	await tradePool.setSwapRouter(UniSwapRouter);
+	await tradePool.setTrader(trader.address);
 
 	await network.provider.request({
 		method: 'hardhat_impersonateAccount',
 		params: [BinanceWallet],
 	});
 	const binanceBoss = await ethers.getSigner(BinanceWallet);
-
-	const [owner, trader, ...otherAccount] = await ethers.getSigners();
 
 	await owner.sendTransaction({
 		to: binanceBoss.address,

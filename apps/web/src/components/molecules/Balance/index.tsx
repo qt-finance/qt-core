@@ -10,7 +10,7 @@ interface BalanceProperty {
 }
 
 const Balance: React.FC<BalanceProperty> = ({ className }) => {
-	const [{ usdc, weth }] = useBalance();
+	const [{ usdc, weth, tradePool }] = useBalance();
 
 	return (
 		<div className={classnames(styles.balance, className)}>
@@ -18,7 +18,12 @@ const Balance: React.FC<BalanceProperty> = ({ className }) => {
 			<div className={styles.content}>
 				<div>USDC: {usdc.balance.toString()}</div>
 				<div>WETH: {weth.balance.toString()}</div>
-				<div>qWETH-USDC:</div>
+				<div>qWETH-USDC: {tradePool.balance.toString()}</div>
+			</div>
+			<h2>In Pending Pool</h2>
+			<div className={styles.content}>
+				<div>USDC: {tradePool.accountData.asset.toString()}</div>
+				<div>Round: {tradePool.accountData.round.toString()}</div>
 			</div>
 		</div>
 	);

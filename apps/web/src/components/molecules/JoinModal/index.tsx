@@ -52,7 +52,7 @@ const JoinModal: React.FC<JoinModalProperty> = ({ className }) => {
 			<div>Your Available USDC: {usdc.balance.toString()}</div>
 			<div className={styles.action}>
 				<input type="number" placeholder="Number of USDC" value={num} onChange={onChange} />
-				{usdc.allowance === 0n ? (
+				{usdc.allowance.toNumber() === 0 ? (
 					<button type="button" onClick={onApprove}>
 						Approve
 					</button>

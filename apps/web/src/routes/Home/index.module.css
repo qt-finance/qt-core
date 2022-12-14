@@ -7,22 +7,34 @@
 
 	& > .section {
 		display: flex;
-		align-items: center;
-		padding: 0 16px;
+		flex-direction: column;
+		padding: 16px;
 		width: 100%;
 		max-width: 600px;
-		height: 80px;
 		border: 1px solid var(--primary);
 		background-color: var(--dark);
 		border-radius: 8px;
 		margin-bottom: 20px;
 
-		& > .name {
-			margin-right: 10px;
+		& > .head {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			& > .name {
+				margin-right: 10px;
+			}
 		}
 
-		& > button {
-			margin-left: auto;
+		& > .content {
+			display: flex;
+			flex-wrap: wrap;
+			margin-top: 24px;
+
+			& > div {
+				width: 50%;
+				margin-bottom: 8px;
+			}
 		}
 	}
 }
