@@ -31,7 +31,7 @@ const Home: React.FC = () => {
 						>
 							Join
 						</button>
-						{tradePool.balance.toNumber() >= 0 && (
+						{tradePool.balance.toNumber() > 0 && (
 							<button
 								className={styles.button}
 								type="button"
