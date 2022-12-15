@@ -1,11 +1,18 @@
 import { Injectable } from 'injection-js';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { tradePoolAddress, USDCAddress, WETHAddress } from '@qt-core/core';
+import {
+	tradePoolAddress,
+	USDCAddress,
+	WETHAddress,
+	simplePriceOracleAddress,
+} from '@qt-core/core';
 import ERC20Abi from '@qt-core/core/artifacts/@openzeppelin/contracts/token/ERC20/ERC20.sol/ERC20.json';
 import { ERC20 } from '@qt-core/core/web3-types/@openzeppelin/contracts/token/ERC20';
 import { TradePool as TradePoolContract } from '@qt-core/core/web3-types/contracts/TradePool';
 import TradePoolAbi from '@qt-core/core/artifacts/contracts/TradePool.sol/TradePool.json';
+import { SimplePriceOracle } from '@qt-core/core/web3-types/contracts/test/SimplePriceOracle';
+import SimplePriceOracleAbi from '@qt-core/core/artifacts/contracts/test/SimplePriceOracle.sol/SimplePriceOracle.json';
 import BigNumber from 'bignumber.js';
 
 import { BasicModel, useDI } from 'util/di';
@@ -41,7 +48,12 @@ export interface BalanceState {
 		};
 		pendingPool: {
 			currentRound: number;
+			total: BigNumber;
 		};
+	};
+	price: {
+		contract: SimplePriceOracle;
+		weth: BigNumber;
 	};
 }
 
@@ -64,6 +76,11 @@ export class BalanceModel extends BasicModel<BalanceState> {
 			TradePoolAbi.abi as AbiItem[],
 			tradePoolAddress,
 		) as unknown as TradePoolContract;
+
+		const simplePriceOracleContract = new web3.eth.Contract(
+			SimplePriceOracleAbi.abi as AbiItem[],
+			simplePriceOracleAddress,
+		) as unknown as SimplePriceOracle;
 
 		const zero = new BigNumber(0);
 
@@ -95,7 +112,12 @@ export class BalanceModel extends BasicModel<BalanceState> {
 				},
 				pendingPool: {
 					currentRound: 0,
+					total: zero,
 				},
+			},
+			price: {
+				contract: simplePriceOracleContract,
+				weth: zero,
 			},
 		};
 	}
@@ -120,7 +142,7 @@ export class BalanceModel extends BasicModel<BalanceState> {
 	};
 
 	public subscribeContract = () => {
-		const { account, usdc, weth, tradePool } = this.getState();
+		const { account, usdc, weth, tradePool, price } = this.getState();
 
 		console.log('BalanceModel: start subscribeContract', account);
 
@@ -139,6 +161,7 @@ export class BalanceModel extends BasicModel<BalanceState> {
 				pendingPool,
 				tradePoolUSDCBalance,
 				tradePoolWETHBalance,
+				wethPrice,
 			] = await Promise.all([
 				usdc.contract.methods.balanceOf(account).call(),
 				weth.contract.methods.balanceOf(account).call(),
@@ -150,6 +173,7 @@ export class BalanceModel extends BasicModel<BalanceState> {
 				tradePool.contract.methods.pendingPool().call(),
 				usdc.contract.methods.balanceOf(tradePoolAddress).call(),
 				weth.contract.methods.balanceOf(tradePoolAddress).call(),
+				price.contract.methods.getPrice(WETHAddress, USDCAddress).call(),
 			]);
 
 			this.setState(s => ({
@@ -171,7 +195,12 @@ export class BalanceModel extends BasicModel<BalanceState> {
 					},
 					pendingPool: {
 						currentRound: parseInt(pendingPool.currentRound, 10),
+						total: normalizeNum(BigInt(pendingPool.total), 6n),
 					},
+				},
+				price: {
+					...s.price,
+					weth: normalizeNum(BigInt(wethPrice), 18n),
 				},
 			}));
 		};

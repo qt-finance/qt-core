@@ -9,6 +9,10 @@
 	border-radius: 8px;
 	margin-bottom: 20px;
 
+	& > h4 {
+		margin-top: 24px;
+	}
+
 	& > .content {
 		display: flex;
 		flex-wrap: wrap;
