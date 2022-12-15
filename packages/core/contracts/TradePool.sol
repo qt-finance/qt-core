@@ -166,19 +166,23 @@ contract TradePool is
 
 	/// @inheritdoc ITradePool
 	function previewValueIndex() public view override returns (uint256) {
-		uint256 tradeBalance = tradeToken.balanceOf(address(this));
-		uint256 baseBalance = baseToken.balanceOf(address(this));
 		uint256 sharesBalance = totalSupply();
 
 		if (sharesBalance == 0) {
 			return 0;
 		}
 
+		PendingPool memory pendingPool_ = pendingPool;
+		uint256 tradeBalance = tradeToken.balanceOf(address(this));
+		uint256 baseBalance = baseToken.balanceOf(address(this));
+
 		// 1e36, baseTokenPrice is the base => 1e18
 		uint256 tradeValue = (quantroller.getPrice(address(tradeToken), address(baseToken)) *
 			tradeBalance);
 
-		return (tradeValue + _normalizeBaseTokenValue(baseBalance * 1e18)) / sharesBalance;
+		return
+			(tradeValue + _normalizeBaseTokenValue((baseBalance - pendingPool_.total) * 1e18)) /
+			sharesBalance;
 	}
 
 	/// @inheritdoc ITradePool
