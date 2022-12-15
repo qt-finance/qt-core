@@ -31,9 +31,6 @@ async function main() {
 
 	// await simplePriceOracle.setPrice(wethToken.address, usdcToken.address, 1347274425519823367182n);
 
-	const pathType = ['address', 'uint24', 'address'];
-	const path = [USDCAddress, 500, WETHAddress];
-
 	const sellAmount = 5000n * USDC_DECIMAL;
 	const amounOutMinimum = 3711196401632008557n;
 
@@ -44,19 +41,15 @@ async function main() {
 	// console.log('check', currentETHValue);
 	// 1347274425519823367182
 
-	await tradePool
-		.connect(trader)
-		.openLong(ethers.utils.solidityPack(pathType, path), sellAmount, amounOutMinimum);
-
 	const increaseETHValue = currentETHValue.mul(11).div(10);
-
-	const valueIndex = await tradePool.valueIndex();
 
 	// console.log('old valueIndex', valueIndex);
 
-	// await simplePriceOracle.setPrice(wethToken.address, usdcToken.address, increaseETHValue);
+	await simplePriceOracle.setPrice(wethToken.address, usdcToken.address, increaseETHValue);
 
-	console.log('Setup the openTrade', valueIndex);
+	const valueIndex = await tradePool.previewValueIndex();
+
+	console.log('Update the value index', valueIndex);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

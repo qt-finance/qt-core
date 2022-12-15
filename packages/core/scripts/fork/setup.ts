@@ -26,7 +26,7 @@ async function main() {
 		simplePriceOracleAddress,
 	)) as SimplePriceOracle;
 
-	const [owner, trader, ...otherAccount] = await ethers.getSigners();
+	const [owner, trader, user, ...otherAccount] = await ethers.getSigners();
 
 	await tradePool.setMaxAccountsOnPendingPool(10);
 	await quantroller.addMarket(tradePool.address);
@@ -40,14 +40,14 @@ async function main() {
 	});
 	const binanceBoss = await ethers.getSigner(BinanceWallet);
 
-	await owner.sendTransaction({
-		to: binanceBoss.address,
-		value: ethers.utils.parseEther('50.0'), // Sends exactly 1.0 ether
-	});
+	// await owner.sendTransaction({
+	// 	to: binanceBoss.address,
+	// 	value: ethers.utils.parseEther('50.0'), // Sends exactly 1.0 ether
+	// });
 
-	await usdcToken.connect(binanceBoss).transfer(owner.address, 10000n * 10n ** 6n);
+	await usdcToken.connect(binanceBoss).transfer(user.address, 10000n * 10n ** 6n);
 
-	const balanceUSDC = await usdcToken.balanceOf(owner.address);
+	const balanceUSDC = await usdcToken.balanceOf(user.address);
 
 	console.log('Owner Balance', balanceUSDC);
 
