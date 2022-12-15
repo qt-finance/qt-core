@@ -21,8 +21,8 @@
 			justify-content: space-between;
 			align-items: center;
 
-			& > .name {
-				margin-right: 10px;
+			& > .action > button {
+				margin-left: 8px;
 			}
 		}
 

@@ -131,6 +131,25 @@ export class WalletModel extends BasicModel<WalletState> {
 			console.log(error);
 		}
 	};
+
+	public redeem = async (num: number) => {
+		const {
+			contract: { TradePool },
+		} = this.getState();
+
+		if (TradePool === null) {
+			return;
+		}
+
+		console.log('redeem', num);
+
+		try {
+			await TradePool.methods.redeem(scaleNum(num, 18n).toString()).send();
+		} catch (error) {
+			console.log('redeem failed');
+			console.log(error);
+		}
+	};
 }
 
 export const useConnectWeb3 = (): [WalletState, WalletModel] => {

@@ -31,6 +31,7 @@ const restoreModalBackgroundScrollY = () => {
 export enum ModalTypes {
 	Empty,
 	Join,
+	Redeem,
 }
 
 // export enum ModalTyp {}

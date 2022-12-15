@@ -6,6 +6,7 @@ import Balance from 'components/molecules/Balance';
 import { ModalTypes, useModal } from 'models/modal';
 
 import JoinModal from 'components/molecules/JoinModal';
+import RedeemModal from 'components/molecules/RedeemModal';
 
 import { useBalance } from 'models/balance';
 
@@ -22,13 +23,24 @@ const Home: React.FC = () => {
 			<div className={styles.section}>
 				<div className={styles.head}>
 					<h3>WETH-USDC</h3>
-					<button
-						className={styles.button}
-						type="button"
-						onClick={() => modelModal.open(ModalTypes.Join)}
-					>
-						Join
-					</button>
+					<div className={styles.action}>
+						<button
+							className={styles.button}
+							type="button"
+							onClick={() => modelModal.open(ModalTypes.Join)}
+						>
+							Join
+						</button>
+						{tradePool.balance.toNumber() >= 0 && (
+							<button
+								className={styles.button}
+								type="button"
+								onClick={() => modelModal.open(ModalTypes.Redeem)}
+							>
+								Redeem
+							</button>
+						)}
+					</div>
 				</div>
 				<div className={styles.content}>
 					<div>ValueIndex: {tradePool.valueIndex.toString()}</div>
@@ -38,6 +50,7 @@ const Home: React.FC = () => {
 				</div>
 			</div>
 			<JoinModal />
+			<RedeemModal />
 			{/* <div className={styles.section} /> */}
 		</div>
 	);
